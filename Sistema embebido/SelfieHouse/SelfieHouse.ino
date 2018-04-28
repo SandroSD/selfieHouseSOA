@@ -1,43 +1,71 @@
+/****************************************************************************
+|--------------------------------------------------------------------------
+| Projecto      : selfieHouse
+| Version       : 0.0.1
+| Actualizado   : 28/04/2018
+| Bibliotecas   : Servo, DHT, ESP8266WebServer, ESP8266WiFiMulti, ESP8266mDNS
+| Autores       : ~ Dezerio, Sandro (@SandroSD)
+|                 ~ Jalid, Fernando (@fernandodj)
+|                 ~ Ibaceta, Leandro (@libaceta)
+|                 ~ Nestrojil, Lucas (@lucasnestrojil)
+|                 ~ Trotta, Mauro. (@mauroat)
+|--------------------------------------------------------------------------
+|
+| Casa inteligente ATR
+|
+*****************************************************************************/
+
+
+/* Librerias */
 #include <DHT.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
 #include <Servo.h> 
 
+/* Constantes */
 #define DHTTYPE DHT22
 #define TOPE_LLAMA  500
 #define CANTIDAD_INTENTOS_CONEXION 3
 #define TIMEOUT_CONEXION 10
-
+#define TIEMPO_PARPADEO 400       // ms
+#define ACTIVADO 1
+#define DESACTIVADO 0
 
 /* Pines digitales */
-int pinSensorTemperatura = 5;     // DEFINIR
+int pinsensorTempyHum = 5;     // DEFINIR
 int pinSensorMovimiento = 4;      // DEFINIR
 int pinVentilador = 9999;         // DEFINIR
 int pinServo = 9998;
 int pinBuzzer = 4;
 
-
 /* Pines analogicos */
 int pinSensorLlama = A0;
 
-DHT sensorTemperatura(pinSensorTemperatura,DHTTYPE);
+/* Sensores tipo objeto */
+DHT sensorTempyHum(pinsensorTempyHum,DHTTYPE);
 Servo servoTrabaPuerta;
 
-
+/* Mediciones */
 float medicionTemperatura, medicionHumedad, medicionSensacionTermica;
-int medicionLlama;
+int medicionLlama, estadoMovimiento;
+int estadoBuzzer;
 
+
+/* Conexion de red */
 ESP8266WebServer server(80);    // Webserver
 ESP8266WiFiMulti WiFiMulti;     // Responder de peticiones
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-
 const char* ssid = "SOa-IoT";
 const char* password = "laboratorio";
 
-void setup() {
+ /***************************************************************************
+ *            FUNCIONES DE EJECUCION
+ ***************************************************************************/
+
+void setup() 
+{
   Serial.begin(115200);
-  
   
   Serial.print("Conectando a la red ");
   Serial.println(ssid);
@@ -77,19 +105,13 @@ void setup() {
     else 
     {
       Serial.println("ERROR");
-<<<<<<< HEAD
-      }
-	  
-	 
-=======
     }
->>>>>>> 9d85a459aa1af47d8a955ed487893cfe72063d7a
   
 }
 
 void loop() {
   server.handleClient();    // Atencion de peticiones
-  //medirSensores();
+  medirSensores();          // Testear y completar
   //evaluarMediciones();      // Al evaluar se activaran los flags de alarmas y trabas
   
 }
@@ -97,14 +119,12 @@ void loop() {
 
 /*
  * Función conectarAWIFI()
- * Autor: @mauroat
  * Descripción: Intenta realizar una conexión Wifi segun las credenciales establecidas.
  * Devuelve true si la conexión es exitosa, sino retorna false.
  * El tiempo de intento de conexión es de X segundos.
- * Ultima modificacion: 28/4/2018 12:12
- * 
+ * Última modificación: 28/4/2018 12:12 (@mauroat)
 */
-boolean conectarAWIFI()
+bool conectarAWIFI()
 {
  /* Inicio el servidor WiFI*/
   int cantidadIntentosConexion = 0;
@@ -148,10 +168,8 @@ boolean conectarAWIFI()
 
 /*
  * Función iniciarWebserver()
- * Autor: @mauroat
  * Descripción: Prepara las instrucciones esperadas y switchea las posibles variantes con otras funciones
- * Ultima modificacion: 28/4/2018 12:13
- * 
+ * Última modificación: 28/4/2018 12:13 (@mauroat)
 */
 bool iniciarWebserver()
 {
@@ -163,6 +181,17 @@ bool iniciarWebserver()
   /* Realiza una medicion de sensor y devuelve los datos por pantalla */
   server.on("/test", funcionTest);
     
+  /* Trabar puerta */
+  server.on("/trabar", funcionTest);
+  
+  /* Desrabar puerta */
+  server.on("/destrabar", funcionTest);
+
+  /* Activar buzzer */
+  server.on("/buzzon", funcionTest);
+
+  /* Desacrivar buzzer */
+  server.on("/buzzoff", funcionTest);
     
   /* Excepcion ante una peticion no reconocida*/
    server.onNotFound(handleNotFound);
@@ -184,18 +213,132 @@ bool iniciarSensores()
 {
   /* Inicializo Alarma */
   pinMode(pinBuzzer, OUTPUT);
-
+  analogWrite(pinBuzzer,150);   
+  estadoBuzzer = DESACTIVADO;
+  
   /* Inicializo Sensor de Temperatura */
-  // Inicializado como variable global
+  /* Inicializado como variable global */
   
   /* Inicializo Sensor de Movimiento */
-  // No es necesario
+  estadoMovimiento = DESACTIVADO;
 
   /* Inicializo ventilador */
    pinMode(pinVentilador, OUTPUT);
+
+   /* Inicializo servo */
+   servoTrabaPuerta.attach(pinServo);  
   
 }
 
+ /***************************************************************************
+ *            FUNCIONES DE MEDICION Y CONTROL DE SENSORES
+ ***************************************************************************/
+
+
+/*
+ * Función medirSensores()
+ * Descripción: Censa cada uno de los sensores y carga los valores en las variables de medicion y estado.
+ * Última modificación: 28/4/2018 19:58 (@mauroat)
+*/
+void medirSensores()
+{
+  /* Por orden de importancia */
+  
+  medicionLlama = medirLlama();
+  // estadoMovimiento = medirMovimiento(); FALTA
+  medicionTemperatura = medirTemperatura();
+  medicionHumedad = medirHumedad();
+  //medicionLuz = medirLuz();         FALTA
+  
+  Serial.print(mostrarMediciones());
+
+}
+
+/*
+ * Función mostrarMediciones()
+ * Descripción: Devuelve un string con los valores de medicion y estado.
+ * Última modificación: 28/4/2018 19:58 (@mauroat)
+*/
+String mostrarMediciones()
+{
+  String contenido = "";
+
+    contenido += "\nLlama: ";
+    contenido += medicionLlama; 
+    contenido += "\nMovimiento:" ;
+    contenido += estadoMovimiento;
+    contenido += "\nTemperatura:" ;
+    contenido += medicionTemperatura;
+    contenido += "\nHumedad:" ;
+    contenido += medicionHumedad;
+    return contenido;
+}
+
+float medirTemperatura()
+{
+  return sensorTempyHum.readTemperature();
+}
+
+float medirHumedad()
+{
+  return sensorTempyHum.readHumidity();
+}
+
+int medirLlama()
+{
+  return analogRead(pinSensorLlama);
+}
+
+void trabarPuerta(){
+  }
+
+void destrabarPuerta(){
+  }
+
+void parpadearLed(int pin)
+{
+  digitalWrite(pin, LOW);
+  delay(TIEMPO_PARPADEO);
+  digitalWrite(pin, HIGH);
+}
+
+  
+/*
+ * Función medirMovimiento()
+ * Descripción: Detecta HIGH o LOW en el pin indicado y devuelve ACTIVADO en caso de detectar movimiento. Caso contrario devuelve DESACTIVADO
+ * Última modificación: 28/4/2018 20:13 (@mauroat)
+ * Testear!!!!!!
+ * 
+*/
+int medirMovimiento()
+{
+  if(digitalRead(pinSensorMovimiento) == HIGH)
+  {
+    return ACTIVADO;
+ //   Serial.println("Detectado movimiento por el sensor pir");
+ //   digitalWrite(led,HIGH);
+ //   delay(1000);
+ //   digitalWrite(led,LOW);
+  }
+  else
+  {
+    return DESACTIVADO;  
+  }
+}
+
+void sonarAlarma()
+{
+  estadoBuzzer = ACTIVADO;
+  tone(pinBuzzer,500,1000);
+  delay(1000);
+  tone(pinBuzzer,1000,1000);
+  delay(1000); 
+}
+
+
+ /***************************************************************************
+ *            FUNCIONES DE RESPUESTA DE WEBSERVER
+ ***************************************************************************/
 
 void funcionTest()
 {
@@ -238,39 +381,3 @@ void handleNotFound()
   //parpadearLed(pinAuxiliar);
 }
 
-
-void medirTemperaturaYHumedad()
-{
-  float medicionHumedad = sensorTemperatura.readHumidity();
-  Serial.print("Humedad:" );
-  Serial.println(medicionHumedad);
-  float medicionTemperatura = sensorTemperatura.readTemperature();
-  Serial.print("Temperatura:" );
-  Serial.println(medicionTemperatura);
-  float medicionSensacionTermica = sensorTemperatura.computeHeatIndex(medicionTemperatura, medicionHumedad, false);
-  Serial.print("Sensacion termica:" );
-  Serial.println(medicionSensacionTermica);
-}
-
-int medirLlama()
-{
-  int medicion = analogRead(pinSensorLlama);
-  Serial.print("Llama:" );
-  Serial.println(medicion);
-  return medicion;
-}
-
-void sonarAlarma(){
-
-  tone(pinBuzzer,500,1000);
-  delay(1000);
-  tone(pinBuzzer,1000,1000);
-  delay(1000);
-  
-}
-
-void inicializarSalidas(){
-
- pinMode(pinBuzzer, OUTPUT);   // sets the pin as output
- analogWrite(pinBuzzer,150);   
-}
