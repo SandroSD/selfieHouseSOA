@@ -54,6 +54,8 @@ void setup() {
     else {
       Serial.println("ERROR");
       }
+	  
+	 
   
 }
 
@@ -204,4 +206,19 @@ int medirLlama()
   Serial.print("Llama:" );
   Serial.println(medicion);
   return medicion;
+}
+
+void sonarAlarma(){
+
+  tone(pinBuzzer,500,1000);
+  delay(1000);
+  tone(pinBuzzer,1000,1000);
+  delay(1000);
+  
+}
+
+void inicializarSalidas(){
+
+ pinMode(pinBuzzer, OUTPUT);   // sets the pin as output
+ analogWrite(pinBuzzer,150);   
 }
