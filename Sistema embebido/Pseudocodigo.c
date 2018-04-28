@@ -12,9 +12,9 @@ void setup()
 	
 	definirPinesDeEntradaYSalida();		// Defino los pines que seran utilizados como sensores / actuadores.
 	
-	if(conectarAWIFI())			
+	if(conectarAWIFI())		// OK	
 	{     
-	  iniciarWebServer();	  
+	  iniciarWebServer();	  	// OK
     } 
 	else 
 	{
@@ -31,7 +31,7 @@ void setup()
 */	
 void loop()
 {
-	server.handleClient();		// Atencion de peticiones
+	server.handleClient();		// Atencion de peticiones	// OK
 	censarSensores();
 	evaluoCensados();
 	
