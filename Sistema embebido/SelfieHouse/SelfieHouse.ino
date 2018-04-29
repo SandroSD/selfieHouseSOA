@@ -33,11 +33,14 @@
 #define DESACTIVADO 0
 
 /* Pines digitales */
-int pinsensorTempyHum = 5;     // DEFINIR
+int pinsensorTempyHum = 5;      // DEFINIR
 int pinSensorMovimiento = 4;      // DEFINIR
 int pinVentilador = 9999;         // DEFINIR
 int pinServo = 9998;
 int pinBuzzer = 4;
+int pinLEDAzul;
+int pinLEDAmarillo;
+
 
 /* Pines analogicos */
 int pinSensorLlama = A0;
@@ -227,7 +230,10 @@ bool iniciarSensores()
 
    /* Inicializo servo */
    servoTrabaPuerta.attach(pinServo);  
-  
+
+   /* Inicializo LEDs  */
+   pinMode(pinLEDAzul, OUTPUT);
+   pinMode(pinLEDAmarillo, OUTPUT);
 }
 
  /***************************************************************************
@@ -245,7 +251,7 @@ void medirSensores()
   /* Por orden de importancia */
   
   medicionLlama = medirLlama();
-  // estadoMovimiento = medirMovimiento(); FALTA
+  estadoMovimiento = medirMovimiento(); //FALTA TESTEAR
   medicionTemperatura = medirTemperatura();
   medicionHumedad = medirHumedad();
   //medicionLuz = medirLuz();         FALTA
@@ -253,6 +259,25 @@ void medirSensores()
   Serial.print(mostrarMediciones());
 
 }
+
+bool evaluarMediciones ()
+{
+  String contenido = "";
+  /* Evaluo por orden de importancia */
+  if(medicionLlama < TOPE_LLAMA){
+    // No hay fuego
+  } else {
+    contenido += "Se detecta la presencia de llama. Valor = ";
+    contenido += medicionLlama;
+    
+    estadoBuzzer = ACTIVADO;
+    // enviar aviso al servidor apache para que mande notificacion
+    
+  }
+
+  
+}
+
 
 /*
  * Función mostrarMediciones()
@@ -290,10 +315,25 @@ int medirLlama()
 }
 
 void trabarPuerta(){
-  }
+  for(int pos = 0; pos <= 90; pos += 1) // goes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    servoTrabaPuerta.write(pos);     // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+}
 
 void destrabarPuerta(){
-  }
+
+  for(int pos = 90; pos>=0; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    servoTrabaPuerta.write(pos);      // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+  
+}
+
+
+
 
 void parpadearLed(int pin)
 {
