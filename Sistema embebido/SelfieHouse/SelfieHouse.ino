@@ -25,12 +25,30 @@
 
 /* Constantes */
 #define DHTTYPE DHT22
-#define TOPE_LLAMA  500
+
 #define CANTIDAD_INTENTOS_CONEXION 3
 #define TIMEOUT_CONEXION 10
 #define TIEMPO_PARPADEO 400       // ms
 #define ACTIVADO 1
 #define DESACTIVADO 0
+
+#define TOPE_LLAMA  500
+#define TOPE_TEMPERATURA	30 	
+#define TOPE_HUMEDAD	85
+
+#define PUERTA_TRABADA     1000
+#define PUERTA_DESTRABADA   1001
+#define BUZZER_ACTIVADO     1002
+#define BUZZER_DESACTIVADO  1003
+#define VENTILADOR_ACTIVADO     1004
+#define VENTILADOR_DESACTIVADO  1005
+
+#define DISPARADOR_MOVIMIENTO   2000 
+#define DISPARADOR_LLAMA        2001
+#define DISPARADOR_TEMPERATURA  2002
+#define DISPARADOR_LUZ          2003
+#define DISPARADOR_MANUAL       2004
+
 
 /* Pines digitales */
 int pinsensorTempyHum = 5;      // DEFINIR
@@ -40,7 +58,8 @@ int pinServo = 9998;
 int pinBuzzer = 4;
 int pinLEDAzul;
 int pinLEDAmarillo;
-
+int pinLEDRojo;
+int pinLEDVerde;
 
 /* Pines analogicos */
 int pinSensorLlama = A0;
@@ -52,15 +71,19 @@ Servo servoTrabaPuerta;
 /* Mediciones */
 float medicionTemperatura, medicionHumedad, medicionSensacionTermica;
 int medicionLlama, estadoMovimiento;
-int estadoBuzzer;
+int estadoBuzzer, estadoTraba, estadoVentilador;
 
 
 /* Conexion de red */
 ESP8266WebServer server(80);    // Webserver
 ESP8266WiFiMulti WiFiMulti;     // Responder de peticiones
+WiFiClient client;              // Cliente que avisa al servidor Apache
+
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
 const char* ssid = "SOa-IoT";
 const char* password = "laboratorio";
+const char * ipServidorApache = "192.168.3.186";              // Servidor Apache - Hay que disponer de una IP fija
+const uint16_t puertoIpServidorApache = 80;                         // Puerto Servidor Apache
 
  /***************************************************************************
  *            FUNCIONES DE EJECUCION
@@ -100,7 +123,16 @@ void setup()
       Serial.print("Inicializando Webserver: ");
       if(iniciarWebserver()){
         Serial.println("OK!");
-      } else {
+    
+    Serial.print("Inicializando Cliente Apache: ");
+    if(iniciarCliente()){
+      Serial.println("OK!");
+      
+    } else {
+      Serial.println("ERROR");
+    }
+    
+    } else {
         Serial.println("ERROR");
       }
       delay(300);
@@ -115,7 +147,7 @@ void setup()
 void loop() {
   server.handleClient();    // Atencion de peticiones
   medirSensores();          // Testear y completar
-  //evaluarMediciones();      // Al evaluar se activaran los flags de alarmas y trabas
+  evaluarMediciones();      // Al evaluar se activaran los flags de alarmas y trabas
   
 }
 
@@ -172,7 +204,7 @@ bool conectarAWIFI()
 /*
  * Función iniciarWebserver()
  * Descripción: Prepara las instrucciones esperadas y switchea las posibles variantes con otras funciones
- * Última modificación: 28/4/2018 12:13 (@mauroat)
+ * Última modificación: 30/4/2018 14:20 (@mauroat)
 */
 bool iniciarWebserver()
 {
@@ -185,17 +217,26 @@ bool iniciarWebserver()
   server.on("/test", funcionTest);
     
   /* Trabar puerta */
-  server.on("/trabar", funcionTest);
+  server.on("/lock", trabarPuertaWS);
   
   /* Desrabar puerta */
-  server.on("/destrabar", funcionTest);
+  server.on("/unlock", destrabarPuertaWS);
 
   /* Activar buzzer */
-  server.on("/buzzon", funcionTest);
+  server.on("/buzzon", activarBuzzerWS);
 
-  /* Desacrivar buzzer */
-  server.on("/buzzoff", funcionTest);
-    
+  /* Desactivar buzzer */
+  server.on("/buzzoff", desactivarBuzzerWS);
+  
+  /* Activar ventilador */
+  server.on("/fanon", activarVentiladorWS);
+
+  /* Desactivar ventilador */
+  server.on("/fanoff", desactivarVentiladorWS);
+  
+  /* Informacion de los sensores */
+//  server.on("/info", informarSensores);
+  
   /* Excepcion ante una peticion no reconocida*/
    server.onNotFound(handleNotFound);
 
@@ -210,6 +251,76 @@ bool iniciarWebserver()
   return true;
 }
 
+
+/*
+ * Función iniciarCliente()
+ * Descripción: Inicializa el servicio de enviar mensajes al servidor Apache para actualizar la base de datos
+ * Última modificación: 30/4/2018 13:11 (@mauroat)
+*/
+
+bool iniciarCliente(){
+  if (!client.connect(ipServidorApache, puertoIpServidorApache)) 
+  {
+    //Serial.println("La conexion fallo");
+    //Serial.println("espere 5 segundos...");
+    //delay(5000);
+    return false;
+  }
+  return true;   
+  
+}
+
+
+
+ /***************************************************************************
+ *            FUNCIONES DE ACCION ANTE UNA PETICION DEL WEBSERVER
+ ***************************************************************************/
+
+
+void trabarPuertaWS()
+{
+    trabarPuerta();
+	//enviarAlServidorWS(PUERTA_TRABADA,disparador);
+}
+void destrabarPuertaWS()
+{
+    destrabarPuerta();
+    //enviarAlServidorWS(PUERTA_TRABADA,disparador);
+}
+void activarBuzzerWS()
+{
+  activarBuzzer();
+  //enviarAlServidorWS(BUZZER_ACTIVADO,disparador);
+}
+void desactivarBuzzerWS()
+{
+//    desactivarBuzzer();   // No programada todavia
+    //enviarAlServidorWS(BUZZER_DESACTIVADO,disparador);
+}
+void activarVentiladorWS()
+{
+  activarVentilador();
+  //enviarAlServidorWS(VENTILADOR_ACTIVADO,disparador);
+}
+void desactivarVentiladorWS()
+{
+  desactivarVentilador();
+  //enviarAlServidorWS(VENTILADOR_DESACTIVADO,disparador);
+}
+
+/*
+ * Función enviarAlServidorWS(int,int)
+ * Descripción: Envia un mensaje GET al servidor Apache informando un cambio de estado en los actuadores
+ * Última modificación: 28/4/2018 19:58 (@mauroat)
+*/
+void enviarAlServidorWS(int accion, int disparador)
+{
+    String contenido = "GET /selfieHouse/ws/controllerArduino.php?accion=";
+        contenido += accion;
+        contenido += "&disparador=";
+        contenido += disparador;
+    client.print(contenido);
+}
 
 
 bool iniciarSensores()
@@ -229,11 +340,15 @@ bool iniciarSensores()
    pinMode(pinVentilador, OUTPUT);
 
    /* Inicializo servo */
+   estadoTraba = ACTIVADO;
    servoTrabaPuerta.attach(pinServo);  
-
+   trabarPuerta();
+    
    /* Inicializo LEDs  */
    pinMode(pinLEDAzul, OUTPUT);
    pinMode(pinLEDAmarillo, OUTPUT);
+   pinMode(pinLEDRojo, OUTPUT);
+   pinMode(pinLEDVerde, OUTPUT);
 }
 
  /***************************************************************************
@@ -264,17 +379,53 @@ bool evaluarMediciones ()
 {
   String contenido = "";
   /* Evaluo por orden de importancia */
-  if(medicionLlama < TOPE_LLAMA){
+  
+  Serial.print("Se evalua el nivel de llama: ");
+  if(medicionLlama < TOPE_LLAMA)
+  {
     // No hay fuego
+	Serial.println("Normal");
+
   } else {
-    contenido += "Se detecta la presencia de llama. Valor = ";
-    contenido += medicionLlama;
-    
-    estadoBuzzer = ACTIVADO;
-    // enviar aviso al servidor apache para que mande notificacion
-    
+    // Activo el Buzzer e informo al servidor Apache
+      Serial.println("FUEGO!!!");
+      Serial.println("Activo la alarma y aviso al servidor Apache");
+      enviarAlServidorWS(BUZZER_ACTIVADO,DISPARADOR_LLAMA);
+	  
   }
 
+  Serial.print("Se evalua la detección de movimiento: ");
+  if(estadoMovimiento == DESACTIVADO)
+  {
+    // No hay fuego
+      Serial.println("No se detectó movimiento");  
+  } else {
+    // Activo el Buzzer e informo al servidor Apache
+      Serial.println("Se detectó movimiento");
+      Serial.println("Activo la alarma y aviso al servidor Apache");
+      enviarAlServidorWS(BUZZER_ACTIVADO,DISPARADOR_MOVIMIENTO);
+	 
+  }  
+  
+  Serial.print("Se evalua la temperatura y humedad: ");
+  if(medicionTemperatura <= TOPE_TEMPERATURA && medicionHumedad <= TOPE_HUMEDAD)
+  {
+    // No hay fuego
+      Serial.println("Valor/es en rango aceptable");  
+  } else {
+    // Activo el ventilador e informo al servidor Apache
+      Serial.println("Valor/es fuera de rango");
+      Serial.println("Activo la alarma y aviso al servidor Apache");
+      
+      activarVentilador();
+      
+      enviarAlServidorWS(VENTILADOR_ACTIVADO,DISPARADOR_TEMPERATURA);
+	  //enviarAlServidorWS(BUZZER_ACTIVADO,DISPARADOR_TEMPERATURA);
+
+
+  }  
+  
+  
   
 }
 
@@ -314,16 +465,27 @@ int medirLlama()
   return analogRead(pinSensorLlama);
 }
 
+void activarVentilador(){
+  estadoVentilador = ACTIVADO;
+  digitalWrite(pinVentilador, HIGH);
+}
+
+void desactivarVentilador(){
+  estadoVentilador = DESACTIVADO;
+  digitalWrite(pinVentilador, LOW);
+}
+
 void trabarPuerta(){
+  estadoTraba = ACTIVADO;
   for(int pos = 0; pos <= 90; pos += 1) // goes from 0 degrees to 180 degrees 
   {                                  // in steps of 1 degree 
     servoTrabaPuerta.write(pos);     // tell servo to go to position in variable 'pos' 
     delay(15);                       // waits 15ms for the servo to reach the position 
-  } 
+  }
 }
 
 void destrabarPuerta(){
-
+  estadoTraba = DESACTIVADO;
   for(int pos = 90; pos>=0; pos-=1)     // goes from 180 degrees to 0 degrees 
   {                                
     servoTrabaPuerta.write(pos);      // tell servo to go to position in variable 'pos' 
@@ -331,9 +493,6 @@ void destrabarPuerta(){
   } 
   
 }
-
-
-
 
 void parpadearLed(int pin)
 {
@@ -354,6 +513,7 @@ int medirMovimiento()
 {
   if(digitalRead(pinSensorMovimiento) == HIGH)
   {
+    //digitalWrite(led,LOW);      
     return ACTIVADO;
  //   Serial.println("Detectado movimiento por el sensor pir");
  //   digitalWrite(led,HIGH);
@@ -366,7 +526,7 @@ int medirMovimiento()
   }
 }
 
-void sonarAlarma()
+void activarBuzzer()
 {
   estadoBuzzer = ACTIVADO;
   tone(pinBuzzer,500,1000);
@@ -399,7 +559,6 @@ void funcionTest()
       contenido += "</body>";
     
     server.send(200, "text/html", contenido);       
-//    return contenido;
     
   }
 
@@ -420,4 +579,5 @@ void handleNotFound()
   server.send(404, "text/plain", message);
   //parpadearLed(pinAuxiliar);
 }
+
 
