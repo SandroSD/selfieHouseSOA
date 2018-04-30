@@ -51,27 +51,27 @@
 
 
 /* Pines digitales */
-int pinsensorTempyHum = 5;      // DEFINIR
-int pinSensorMovimiento = 4;      // DEFINIR
-int pinVentilador = 9999;         // DEFINIR
-int pinServo = 9998;
-int pinBuzzer = 4;
-int pinLEDAzul;
-int pinLEDAmarillo;
+int pinSensorTempyHum = 5;        // GPIO10 - SD03
+int pinSensorMovimiento = 4;      // GPIO09 - SD02
+int pinVentilador = 15;            // GPIO15 - D8
+int pinServo = 16;                // GPIO16 - D0
+int pinBuzzer = 3;                // GPIO03 - RX
+int pinLEDAzul = 5;               // GPIO05 - D1
+int pinLEDAmarillo = 4;           // GPIO04 - D2
 int pinLEDRojo;
 int pinLEDVerde;
 
 /* Pines analogicos */
-int pinSensorLlama = A0;
+int pinSensorLlama = A0;          // A0
 
 /* Sensores tipo objeto */
-DHT sensorTempyHum(pinsensorTempyHum,DHTTYPE);
+DHT sensorTempyHum(pinSensorTempyHum,DHTTYPE);
 Servo servoTrabaPuerta;
 
 /* Mediciones */
 float medicionTemperatura, medicionHumedad, medicionSensacionTermica;
 int medicionLlama, estadoMovimiento;
-int estadoBuzzer, estadoTraba, estadoVentilador;
+int estadoBuzzer, estadoTraba, estadoVentilador, estadoWebserver;
 
 
 /* Conexion de red */
@@ -80,8 +80,8 @@ ESP8266WiFiMulti WiFiMulti;     // Responder de peticiones
 WiFiClient client;              // Cliente que avisa al servidor Apache
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "SOa-IoT";
-const char* password = "laboratorio";
+const char* ssid = "WIFi-MT";
+const char* password = "*xeneize1905+";
 const char * ipServidorApache = "192.168.3.186";              // Servidor Apache - Hay que disponer de una IP fija
 const uint16_t puertoIpServidorApache = 80;                         // Puerto Servidor Apache
 
@@ -124,22 +124,23 @@ void setup()
       if(iniciarWebserver()){
         Serial.println("OK!");
     
-    Serial.print("Inicializando Cliente Apache: ");
-    if(iniciarCliente()){
-      Serial.println("OK!");
-      
-    } else {
-      Serial.println("ERROR");
-    }
+        Serial.print("Inicializando Cliente Apache: ");
+        if(iniciarCliente()){
+          Serial.println("OK!");
+          
+        } else {
+          Serial.println("ERROR");
+        }
     
     } else {
         Serial.println("ERROR");
       }
-      delay(300);
+      delay(60000000);
     }
     else 
     {
       Serial.println("ERROR");
+      delay(60000000);
     }
   
 }
@@ -326,17 +327,17 @@ void enviarAlServidorWS(int accion, int disparador)
 bool iniciarSensores()
 {
   /* Inicializo Alarma */
+  
   pinMode(pinBuzzer, OUTPUT);
   analogWrite(pinBuzzer,150);   
   estadoBuzzer = DESACTIVADO;
   
   /* Inicializo Sensor de Temperatura */
-  /* Inicializado como variable global */
   
-  /* Inicializo Sensor de Movimiento */
-  estadoMovimiento = DESACTIVADO;
+   /* Inicializo Sensor de Movimiento */
+   estadoMovimiento = DESACTIVADO;
 
-  /* Inicializo ventilador */
+   /* Inicializo ventilador */
    pinMode(pinVentilador, OUTPUT);
 
    /* Inicializo servo */
@@ -347,8 +348,10 @@ bool iniciarSensores()
    /* Inicializo LEDs  */
    pinMode(pinLEDAzul, OUTPUT);
    pinMode(pinLEDAmarillo, OUTPUT);
-   pinMode(pinLEDRojo, OUTPUT);
-   pinMode(pinLEDVerde, OUTPUT);
+   //pinMode(pinLEDRojo, OUTPUT);
+   //pinMode(pinLEDVerde, OUTPUT);
+
+   return true;
 }
 
  /***************************************************************************
@@ -390,6 +393,7 @@ bool evaluarMediciones ()
     // Activo el Buzzer e informo al servidor Apache
       Serial.println("FUEGO!!!");
       Serial.println("Activo la alarma y aviso al servidor Apache");
+      activarBuzzer();
       enviarAlServidorWS(BUZZER_ACTIVADO,DISPARADOR_LLAMA);
 	  
   }
@@ -397,12 +401,12 @@ bool evaluarMediciones ()
   Serial.print("Se evalua la detección de movimiento: ");
   if(estadoMovimiento == DESACTIVADO)
   {
-    // No hay fuego
       Serial.println("No se detectó movimiento");  
   } else {
     // Activo el Buzzer e informo al servidor Apache
       Serial.println("Se detectó movimiento");
       Serial.println("Activo la alarma y aviso al servidor Apache");
+      activarBuzzer();
       enviarAlServidorWS(BUZZER_ACTIVADO,DISPARADOR_MOVIMIENTO);
 	 
   }  
