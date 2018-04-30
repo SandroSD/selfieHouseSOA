@@ -1,0 +1,24 @@
+.camcontent{
+    margin-top:0.5em;    
+}
+#video, #canvas{
+    border: 0.4em black solid;
+    border-radius: 25px;    
+    height: 60vh;    
+}    
+#canvas, #reset, #upload{
+    display:none;
+}
+.cambuttons{
+    text-align: center;
+}
+
+@media (max-width: 600px){
+    #video, #canvas{
+        width: 90vw;
+        height:100%;
+    }
+    .cambuttons{
+        text-align: center;
+    }
+}
