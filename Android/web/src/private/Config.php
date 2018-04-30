@@ -19,7 +19,7 @@ define("LOG_SIZE","50000");
 define("LOG_ALERTA","alerta");
 define("LOG_SERVER","server");
 define("LOG_DB","database");
-define("LOG_CLIENTE","btmp");
+define("LOG_CLIENTE","shouse");
 
 
 # Configuración de sesión
