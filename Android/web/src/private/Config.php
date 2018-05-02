@@ -9,7 +9,7 @@
 define("PATH_LOG","C:/xampp/htdocs/".NOMBRE_DIRECTORIO."/log/");
 //define("PATH_LOG","log/");
 
-# Tamaño del log (Cantidad de lineas visualizables en LogView)
+# TamaÃ±o del log (Cantidad de lineas visualizables en LogView)
 
 define("LOG_SIZE","50000");
 
@@ -22,16 +22,12 @@ define("LOG_DB","database");
 define("LOG_CLIENTE","shouse");
 
 
-# Configuración de sesión
+# ConfiguraciÃ³n de sesiÃ³n
 
 
 define('CANT_INTENTOS_LOGUEO',3);
 
 
-# Configuración de tiempo de sesión (en ms.)
-
-
-define('TIEMPO_SESION',150000);
 
 /***************************************
  ******** VALORES GET ****************
@@ -75,14 +71,18 @@ define("SECCION_LOGOUT",    sha1("ySSDFsdQ41"));
 
 # Configuracion de la base de datos MySQL
 
+define("DIRECCION_ARDUINO","localhost");
 define("SERVER","localhost");
-define("USER","sh_admin");
-define("PASS","asdasdasdasd");
-define("DB","db_selfieHouse");
+define("USER","root");
+define("PASS","spaceinvaders");
+define("DB","db_selfiehouse");
 
 /***************************************
- ******** ESTADOS DE USUARIO ****************
+ ******** ESTADOS  ****************
  ***************************************/
+define("ACTIVADO","1");
+define("DESACTIVADO","0");
+
 define("USUARIO_ACTIVO","1");
 define("USUARIO_INACTIVO","2");
 define("USUARIO_BLOQUEADO","-1");
@@ -90,17 +90,37 @@ define("USUARIO_BLOQUEADO","-1");
 # Resultados programados
 
 define("TODO_OK",1);
-define("ERROR",2);
-define("USUARIO_EXISTENTE",3);
-define("USUARIO_INEXISTENTE",4);
-define("USUARIO_ERROR_BORRAR_A_SI_MISMO",5);
-define("USUARIO_DATOS_INCORRECTOS",6);
-define("USUARIO_BLOQUEADO",-1);
-define("USUARIO_ELIMINADO",9);
+define("ERROR",0);
 
-define("PERFIL_EXISTENTE",3);
-define("PERFIL_INEXISTENTE",4);
-define("PERFIL_ELIMINADO",9);
+/***************************************
+ ******** ID COMPONENTES  ****************
+ ***************************************/
 
-define("ACTIVAR_ALARMA",1);
-define("DESACTIVAR_ALARMA",0);
+define("ID_TRABA",1);
+define("ID_BUZZER",2);
+define("ID_VENTILADOR",3);
+define("ID_LED_AMARILLO",4);
+define("ID_LED_AZUL",5);
+define("ID_LED_ROJO",6);
+define("ID_LED_VERDE",7);
+
+
+/***************************************
+ ******** ESTADOS DE ACTUADORES ****************
+ ***************************************/
+define("PUERTA_TRABADA",1000);
+define("PUERTA_DESTRABADA",1001);
+define("BUZZER_ACTIVADO",1002);
+define("BUZZER_DESACTIVADO",1003);
+define("VENTILADOR_ACTIVADO",1004);
+define("VENTILADOR_DESACTIVADO",1005);
+
+/***************************************
+ ******** ESTADOS DE DISPARADORES ****************
+ ***************************************/
+
+define("DISPARADOR_MOVIMIENTO",2000);
+define("DISPARADOR_LLAMA",2001);
+define("DISPARADOR_TEMPERATURA",2002);
+define("DISPARADOR_LUZ",2003);
+define("DISPARADOR_MANUAL",2003);

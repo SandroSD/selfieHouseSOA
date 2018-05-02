@@ -19,24 +19,7 @@ class Conexion {
 
     }
     
-    /* Igual al anterior sin el exit() */
-    public function VerificarConexionConDB(){
-        try{
-            
-            $link = new PDO("mysql:host=".SERVER.";dbname=".DB."", USER, PASS, array(
-                PDO::ATTR_PERSISTENT => true, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ));
-            
-            return $link;
-        } catch(PDOException $e){
-            
-            LogController::critical("Conexion::conectar() - Error al conectarse a la base de datos: ".$e->getMessage(),LOG_DB);
-            //  exit;
-            
-        }
-
-    }
-    
+   
     public function generateRandomString($length)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&=*+-_!?';
@@ -121,6 +104,59 @@ class Conexion {
         
     }
     
+    
+    public function cambiarEstado($componente, $estado)
+    {
+        $stmt = Conexion::conectar()->prepare("update estado_componente set estado =:estado where id=:componente;");
+        $stmt->bindParam(":estado", $estado, PDO::PARAM_INT);
+        $stmt->bindParam(":componente", $componente, PDO::PARAM_INT);
+        
+        if($stmt->execute()){
+            $stmt = null;
+            return true;
+        } else {
+            LogController::error("Conexion::cambiarEstado() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            $stmt = null;
+            return false;
+        }
+        
+    }
    
-      
+     
+    public function nuevaNotificacion($comentario)
+    {
+        $stmt = Conexion::conectar()->prepare("insert into notificacion(fecha,comentario,pendiente) VALUES (:fecha,:comentario,:pendiente);");
+        $stmt->bindParam(":pendiente", 1, PDO::PARAM_INT);
+        $stmt->bindParam(":comentario", $comentario, PDO::PARAM_STR);
+        $stmt->bindParam(":fecha", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+        
+        if($stmt->execute()){
+            $stmt = null;
+            return true;
+        } else {
+            LogController::error("Conexion::nuevaNotificacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            $stmt = null;
+            return false;
+        }
+        
+    }
+    
+   
+    
+    public function disparadorLabel($disparador)
+    {
+        if ($disparador == DISPARADOR_MOVIMIENTO){
+            return "Detección de movimiento";
+        } else if ($disparador == DISPARADOR_LLAMA){
+            return "Detección de llama";
+        } else if ($disparador == DISPARADOR_TEMPERATURA){
+            return "Temperatura fuera de rango";
+        } else if ($disparador == DISPARADOR_MANUAL){
+            return "Acción Manual";
+        }  else{
+            return "Desconocido";
+        }
+        
+    }
+    
 }
