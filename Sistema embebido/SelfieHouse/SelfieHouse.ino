@@ -33,7 +33,7 @@
 #define DESACTIVADO 0
 
 #define TOPE_LLAMA  1
-#define TOPE_TEMPERATURA	30 	
+#define TOPE_TEMPERATURA	14 	
 #define TOPE_HUMEDAD	85
 
 #define PUERTA_TRABADA     1000
@@ -370,7 +370,7 @@ bool iniciarSensores()
    /* Inicializo servo */
    estadoTraba = ACTIVADO;
    servoTrabaPuerta.attach(pinServo);  
-   trabarPuerta();
+   //trabarPuerta();
     
    /* Inicializo LEDs  */
    pinMode(pinLEDAzul, OUTPUT);
@@ -419,8 +419,10 @@ bool evaluarMediciones ()
     
     
     // Activo el Buzzer e informo al servidor Apache
-      Serial.println("FUEGO!!!");
-      
+      Serial.println("FUEGO!");
+      estadoBuzzer = ACTIVADO;
+      activarBuzzer();
+      /*
       if(estadoBuzzer == DESACTIVADO)
       {
         Serial.println("Se activa la alarma");
@@ -429,7 +431,7 @@ bool evaluarMediciones ()
       } else {
          Serial.println("Alarma ya activada, no la modifico");
       }
-
+      */
       
       if(estadoLlama == DESACTIVADO)
       {
@@ -452,6 +454,9 @@ bool evaluarMediciones ()
   } else {
     
     Serial.println("Se detectó movimiento");
+    estadoBuzzer = ACTIVADO;
+    activarBuzzer();
+    /*
     if(estadoBuzzer == DESACTIVADO)
       {
         Serial.println("Se activa la alarma");
@@ -460,7 +465,7 @@ bool evaluarMediciones ()
       } else {
          Serial.println("Alarma ya activada, no la modifico");
       }
-
+      */
       
       if(estadoMovimiento == DESACTIVADO)
       {
@@ -476,10 +481,13 @@ bool evaluarMediciones ()
   Serial.print("Se evalua la temperatura y humedad: ");
   if(medicionTemperatura <= TOPE_TEMPERATURA && medicionHumedad <= TOPE_HUMEDAD)
   {
-      Serial.println("Valor/es en rango aceptable");  
+      Serial.println("Temperatura en rango aceptable");  
   } else {
     
-     Serial.println("Se detectó movimiento");
+     Serial.println("Temperatura excedida. Se enciende ventilador");
+     estadoVentilador = ACTIVADO;
+     activarVentilador();
+     /*
      if(estadoVentilador == DESACTIVADO)
      {
         Serial.println("Activo el ventilador");
@@ -488,7 +496,7 @@ bool evaluarMediciones ()
      } else {
         Serial.println("Ventilador encendido, no lo modifico");
      }
-
+    */
       
       if(estadoTyH == DESACTIVADO)
       {
@@ -554,22 +562,34 @@ void desactivarVentilador()
 
 void trabarPuerta()
 {
-  estadoTraba = ACTIVADO;
-  for(int pos = 0; pos <= 90; pos += 1) // goes from 0 degrees to 180 degrees 
-  {                                  // in steps of 1 degree 
-    servoTrabaPuerta.write(pos);     // tell servo to go to position in variable 'pos' 
-    delay(15);                       // waits 15ms for the servo to reach the position 
-  }
+
+  if(estadoTraba == DESACTIVADO)
+  {
+    for(int pos = 0; pos <= 90; pos += 1) // goes from 0 degrees to 180 degrees 
+    {                                  // in steps of 1 degree 
+      servoTrabaPuerta.write(pos);     // tell servo to go to position in variable 'pos' 
+      delay(15);                       // waits 15ms for the servo to reach the position 
+    }
+    estadoTraba = ACTIVADO;
+  } else {
+    Serial.println("La puerta ya esta trabada");
+   }
 }
 
 void destrabarPuerta()
 {
-  estadoTraba = DESACTIVADO;
-  for(int pos = 90; pos>=0; pos-=1)     // goes from 180 degrees to 0 degrees 
-  {                                
-    servoTrabaPuerta.write(pos);      // tell servo to go to position in variable 'pos' 
-    delay(15);                       // waits 15ms for the servo to reach the position 
-  } 
+  
+  if(estadoTraba == ACTIVADO)
+  {
+    for(int pos = 90; pos>=0; pos-=1)     // goes from 180 degrees to 0 degrees 
+    {                                
+      servoTrabaPuerta.write(pos);      // tell servo to go to position in variable 'pos' 
+      delay(15);                       // waits 15ms for the servo to reach the position 
+    } 
+    estadoTraba = DESACTIVADO;
+  } else {
+    Serial.println("La puerta ya esta destrabada");
+   }
 }
 
 void parpadearLed(int pin)
