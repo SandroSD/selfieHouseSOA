@@ -82,8 +82,8 @@ ESP8266WiFiMulti WiFiMulti;     // Responder de peticiones
 WiFiClient client;              // Cliente que avisa al servidor Apache
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "WIFi-MT";
-const char* password = "*xeneize1905+";
+const char* ssid = "asd";
+const char* password = "1234556";
 const char * ipServidorApache = "192.168.3.186";              // Servidor Apache - Hay que disponer de una IP fija
 const uint16_t puertoIpServidorApache = 80;                         // Puerto Servidor Apache
 
