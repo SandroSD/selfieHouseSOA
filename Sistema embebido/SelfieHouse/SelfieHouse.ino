@@ -172,8 +172,6 @@ void loop() {
   medirSensores();          // Testear y completar
 
   evaluarMediciones();      // Al evaluar se activaran los flags de alarmas y trabas
-
-  delay(500);
 }
 
 
