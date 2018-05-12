@@ -2,7 +2,7 @@
   |--------------------------------------------------------------------------
   | Proyecto      : selfieHouse
   | Version       : 1.0.1
-  | Actualizado   : 05/05/2018
+  | Actualizado   : 12/05/2018
   | Bibliotecas   : Servo, DHT, ESP8266WebServer, ESP8266WiFiMulti, ESP8266mDNS
   | Autores       : ~ Dezerio, Sandro (@SandroSD)
   |                 ~ Jalid, Fernando (@fernandodj)
@@ -385,7 +385,7 @@ bool iniciarSensores()
 {
   /* Inicializo Buzzer */
   pinMode(pinBuzzer, OUTPUT);
-  analogWrite(pinBuzzer, 150);
+  //analogWrite(pinBuzzer, 150);
   estadoBuzzer = DESACTIVADO;
 
   /* Inicializo Sensor de Temperatura */
@@ -404,7 +404,7 @@ bool iniciarSensores()
   /* Inicializo servo */
   estadoTraba = ACTIVADO;
   servoTrabaPuerta.attach(pinServo);
-  //trabarPuerta();    // Aca ver de comenzar con la traba puesta
+  trabarPuerta();    // Aca ver de comenzar con la traba puesta
 
 
   return true;
@@ -704,9 +704,9 @@ void activarBuzzer()
 {
   estadoBuzzer = ACTIVADO;
   tone(pinBuzzer, 500, 1000);
-  delay(1000);
+  //delay(1000);
   tone(pinBuzzer, 1000, 1000);
-  delay(1000);
+  //delay(1000);
 }
 
 void desactivarBuzzer()
