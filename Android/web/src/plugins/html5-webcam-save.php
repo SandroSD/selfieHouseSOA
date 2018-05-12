@@ -10,5 +10,6 @@ $userid  = $_POST['userid'] ;
 
 // name & save the image file 
 $fp = fopen('images/'.$datime.'-'.$userid.'.jpg', 'w');
+
 fwrite($fp, $unencoded);
 fclose($fp);
