@@ -6,7 +6,7 @@
 
 # Directorio del log
 
-define("PATH_LOG","C:/xampp/htdocs/".NOMBRE_DIRECTORIO."/log/");
+define("PATH_LOG","C:/xampp/htdocs/selfieHouse/log/");
 //define("PATH_LOG","log/");
 
 # TamaÃ±o del log (Cantidad de lineas visualizables en LogView)
@@ -74,7 +74,7 @@ define("SECCION_LOGOUT",    sha1("ySSDFsdQ41"));
 define("DIRECCION_ARDUINO","localhost");
 define("SERVER","localhost");
 define("USER","root");
-define("PASS","spaceinvaders");
+define("PASS","selfiehousepass");
 define("DB","db_selfiehouse");
 
 /***************************************

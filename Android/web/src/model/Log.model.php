@@ -18,7 +18,7 @@ class Log {
     }
     
     public function write($severidad, $texto){
-       
+        
         if(!is_writable($this->completeDir)){ 
             die ("Error al abrir el log");
         }
@@ -46,7 +46,7 @@ class Log {
         }
         // set default log file for Linux and other systems
         else {
-            $log_file_default = 'C:/log/file/selfieHouse.log';
+            $log_file_default = 'C:/xampp/htdocs/selfiehouse/log/log_server.log';
         }
         // define log file from lfile method or use previously set default
         $lfile =$this->completeDir ? $this->completeDir : $log_file_default;
@@ -80,7 +80,7 @@ class Log {
         }
         // set default log file for Linux and other systems
         else {
-            $log_file_default = 'C:/log/file/selfieHouse.log';
+            $log_file_default = 'C:/log/file/log_server.log';
         }
         // define log file from lfile method or use previously set default
         $lfile =$this->completeDir ? $this->completeDir : $log_file_default;

@@ -7,7 +7,7 @@ class Conexion {
         try{
             
             $link = new PDO("mysql:host=".SERVER.";dbname=".DB."", USER, PASS, array(
-                PDO::ATTR_PERSISTENT => true, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+                PDO::ATTR_PERSISTENT => true, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
             ));
             
             return $link;
@@ -125,10 +125,11 @@ class Conexion {
      
     public function nuevaNotificacion($comentario)
     {
-        $stmt = Conexion::conectar()->prepare("insert into notificacion(fecha,comentario,pendiente) VALUES (:fecha,:comentario,:pendiente);");
-        $stmt->bindParam(":pendiente", 1, PDO::PARAM_INT);
+        $fecha = date("Y-m-d H:i:s");
+        $stmt = Conexion::conectar()->prepare("insert into notificacion(fecha,comentario,pendiente) VALUES (:fecha,:comentario,1);");
+        
         $stmt->bindParam(":comentario", $comentario, PDO::PARAM_STR);
-        $stmt->bindParam(":fecha", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+        $stmt->bindParam(":fecha",$fecha , PDO::PARAM_STR);
         
         if($stmt->execute()){
             $stmt = null;

@@ -27,9 +27,11 @@ if(isset($_GET['accion']) && isset($_GET['disparador']))
     
         case BUZZER_ACTIVADO:
             // Actualizo estado en DB
-            if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO)){
+            
+            if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO))
+            {
                 $comentario = "Se activó la alarma buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
-               
+                
                 // Enviar notificacion
                 Conexion::nuevaNotificacion($comentario);
                 LogController::info($comentario,"LOG_SERVER");
