@@ -1,6 +1,102 @@
 // Put event listeners into place
 window.addEventListener("DOMContentLoaded", function() {
     // Grab elements, create settings, etc.
+    cargarSeccion();
+
+       
+
+}, false);
+
+function registrarCodigo(){
+    $(".ingresoCodigo").click(function(){
+        var scopeBtn = $(this);
+        var valor = scopeBtn.data("val");
+        var inputCodigo = $("input[name=codigo]");
+        var inputHidden = $("input[name=guardarCodigo]");
+
+        var resultado = "";
+        var valorAGuardar = "";
+        
+        console.log("Contenido del hidden antes del switch: "+inputHidden.val());
+        switch (valor) {
+            case 0:
+            case 1:
+            case 2:    
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                console.log("Valor: "+valor);
+                //console.log("Contenido del input: "+inputCodigo);                
+                valorAGuardar+=String(valor);
+                inputHidden.val(valorAGuardar);
+                console.log("Contenido del hidden en el switch: "+inputHidden.val());
+                inputHidden.val(valorAGuardar);
+                console.log("----------------------------------");
+                //console.log("Valor a guardar: "+valorAGuardar);
+
+            break;
+        
+            
+        }
+
+    });
+}
+
+function cargarSeccion(){
+    //$(".container-fluid .row").load("src/assets/templates/camara.php");
+    $.ajax({
+        type: "POST",
+        url: "src/assets/templates/elegirOpcion.php",
+        data: { 
+           
+        },
+        dataType: "html",
+        success: function(data){
+            $(".container-fluid .row").html(data);
+            $("#pedirAutorizacion").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "src/assets/templates/camara.php",
+                    data: { 
+                    
+                    },
+                    dataType: "html",
+                    success: function(data){
+                        $(".container-fluid .row").html(data);
+                        funcionDeCamara();
+                    }
+                }).done(function(msg) {
+                
+                });
+            });
+            $("#ingresar").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "src/assets/templates/ingreso.php",
+                    data: { 
+                    
+                    },
+                    dataType: "html",
+                    success: function(data){
+                        $(".container-fluid .row").html(data);
+                        registrarCodigo();     
+                    }
+                }).done(function(msg) {
+                
+                });
+            });
+        }
+      }).done(function(msg) {
+        
+      });
+    //funcionDeCamara();
+}
+
+function funcionDeCamara(){
     var canvas = document.getElementById("canvas"),
         context = canvas.getContext("2d"),
         video = document.getElementById("video"),
@@ -62,7 +158,7 @@ window.addEventListener("DOMContentLoaded", function() {
         $("#uploading").show();
         $.ajax({
           type: "POST",
-          url: "html5-webcam-save.php",
+          url: "src/plugins/html5-webcam-save.php",
           data: { 
              imgBase64: dataUrl,
              user: "Joe",       
@@ -74,4 +170,4 @@ window.addEventListener("DOMContentLoaded", function() {
           $("#uploaded").show();
         });
     });
-}, false);
+}

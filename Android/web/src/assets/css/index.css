@@ -12,6 +12,26 @@
 .cambuttons{
     text-align: center;
 }
+.opciones{    
+    margin-top:0.3em;    
+    width:15em;
+    font-size: 2em;
+    padding:0.8em;
+}
+.acomodoBoton{
+    text-align: center;
+}
+.ingresoCodigo{
+    width:10vw;
+    height: 15vh;    
+    margin-bottom:0.5em;
+}
+#botonesCodigo{
+    text-align: center;
+}
+#codigo{
+    margin: 1em 0;
+}
 
 @media (max-width: 600px){
     #video, #canvas{
@@ -22,3 +42,9 @@
         text-align: center;
     }
 }
+@media (min-width: 601px){
+    #codigo{
+        width:100%;
+    }
+}
+
