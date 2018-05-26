@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#b3501b"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtSplash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:clickable="false"
+        android:drawableTop="@drawable/ic_home_black_24dp"
+        android:fontFamily="@font/delius_swash_caps"
+        android:text="SelfieHouse"
+        android:textColor="@android:color/background_light"
+        android:textSize="30sp"
+        tools:targetApi="@android:color/background_dark" />
+</RelativeLayout>
