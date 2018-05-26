@@ -1,1 +1,1 @@
-En esta carpeta se inlucira todo lo relacionado al codigo en Android de la aplicacion selfieHouse
+En esta carpeta se incluira todo lo relacionado a Android para selfieHouse

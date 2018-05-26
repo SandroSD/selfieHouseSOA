@@ -18,30 +18,44 @@ USE `db_selfiehouse`;
 
 -- Volcando estructura para tabla db_selfiehouse.acceso
 CREATE TABLE IF NOT EXISTS `acceso` (
+  `ID` int(11) NOT NULL,
   `FECHA` datetime NOT NULL,
   `USUARIO` varchar(10) NOT NULL,
-  `FOTO` mediumblob,
+  `FOTO` varchar(80) DEFAULT NULL,
   `ESTADO` int(11) DEFAULT NULL,
-  PRIMARY KEY (`USUARIO`,`FECHA`)
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- Volcando datos para la tabla db_selfiehouse.acceso: ~0 rows (aproximadamente)
 /*!40000 ALTER TABLE `acceso` DISABLE KEYS */;
 /*!40000 ALTER TABLE `acceso` ENABLE KEYS */;
 
+-- Volcando estructura para tabla db_selfiehouse.configuracion
+CREATE TABLE IF NOT EXISTS `configuracion` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `LATITUD` double DEFAULT '0',
+  `LONGITUD` double DEFAULT '0',
+  KEY `ID` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Volcando datos para la tabla db_selfiehouse.configuracion: ~0 rows (aproximadamente)
+/*!40000 ALTER TABLE `configuracion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configuracion` ENABLE KEYS */;
+
 -- Volcando estructura para tabla db_selfiehouse.estado_componente
 CREATE TABLE IF NOT EXISTS `estado_componente` (
-  `ID` int(11) DEFAULT NULL,
+  `ID` int(11) NOT NULL,
   `NOMBRE` varchar(50) DEFAULT NULL,
   `ESTADO` int(11) DEFAULT NULL,
-  `FECHA` datetime DEFAULT NULL
+  `FECHA` datetime DEFAULT NULL,
+  KEY `ID` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Volcando datos para la tabla db_selfiehouse.estado_componente: ~7 rows (aproximadamente)
 /*!40000 ALTER TABLE `estado_componente` DISABLE KEYS */;
 REPLACE INTO `estado_componente` (`ID`, `NOMBRE`, `ESTADO`, `FECHA`) VALUES
 	(1, 'Traba', 0, '2018-05-02 13:25:38'),
-	(2, 'Buzzer', 0, '2018-05-02 13:25:51'),
+	(2, 'Buzzer', 1, '2018-05-02 13:25:51'),
 	(3, 'Ventilador', 0, '2018-05-02 13:26:09'),
 	(4, 'Led Amarillo', 0, '2018-05-02 13:26:30'),
 	(6, 'Led Rojo', 0, '2018-05-02 13:26:38'),
@@ -56,10 +70,14 @@ CREATE TABLE IF NOT EXISTS `notificacion` (
   `COMENTARIO` varchar(255) DEFAULT NULL,
   `PENDIENTE` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
--- Volcando datos para la tabla db_selfiehouse.notificacion: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla db_selfiehouse.notificacion: ~3 rows (aproximadamente)
 /*!40000 ALTER TABLE `notificacion` DISABLE KEYS */;
+REPLACE INTO `notificacion` (`ID`, `FECHA`, `COMENTARIO`, `PENDIENTE`) VALUES
+	(14, '2018-05-12 23:22:33', 'Se activÃ³ la alarma buzzer. Disparador: DetecciÃ³n de movimiento', 1),
+	(15, '2018-05-12 23:22:41', 'Se activÃ³ la alarma buzzer. Disparador: DetecciÃ³n de movimiento', 1),
+	(16, '2018-05-12 23:28:23', 'Se activÃ³ la alarma buzzer. Disparador: DetecciÃ³n de movimiento', 1);
 /*!40000 ALTER TABLE `notificacion` ENABLE KEYS */;
 
 -- Volcando estructura para tabla db_selfiehouse.perfil
