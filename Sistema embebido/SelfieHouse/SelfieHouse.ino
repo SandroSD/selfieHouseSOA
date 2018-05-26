@@ -425,12 +425,12 @@ void desactivarBuzzerWS()
 }
 void activarVentiladorWS()
 {
-  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender ventilador") : false;;
+  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender ventilador") : false;
   activarVentilador();
 }
 void desactivarVentiladorWS()
 {
-  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar buzzer") : false;
+  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar ventilador") : false;
   desactivarVentilador();
 }
 
@@ -469,7 +469,7 @@ bool iniciarSensores()
   /* Inicializo ventilador */
   estadoVentilador = DESACTIVADO;
   pinMode(pinVentilador, OUTPUT);
-  digitalWrite(pinVentilador, HIGH);
+  digitalWrite(pinVentilador, LOW);
 
   /* Inicializo servo */
   estadoTraba = ACTIVADO;
