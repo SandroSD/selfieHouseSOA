@@ -24,15 +24,8 @@ public class ActividadBotones extends AppCompatActivity{
 
     }
     public void solicitarFoto(){
-        Uri uri = Uri.parse("urlAppFotos");
+        Uri uri = Uri.parse("urlAppFotos"); 
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
-    }
-    public void ingresarHogar(View v){
-        boolean flgControl = false;
-        Intent intent = new Intent (v.getContext(), IngresoActivity.class);
-        //Mando parametro para diferenciar si debe ingresar por 4 digitos u 8(Ingreso o control)
-        intent.putExtra("flgControl",flgControl);
-        startActivityForResult(intent, 0);
     }
 }
