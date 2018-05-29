@@ -18,11 +18,10 @@ class Conexion {
         }
 
     }
-    
    
     public function generateRandomString($length)
     {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&=*+-_!?';
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++)
@@ -32,78 +31,7 @@ class Conexion {
         return $randomString;
     }
       
-    public function getCantidadDeIntentosFallidos($usuario){
-        $stmt = Conexion::conectar()->prepare("SELECT COUNT(*) AS CANTIDAD FROM ACCESO WHERE USUARIO = :usuario;");
-        $stmt->bindParam(":usuario", $usuario, PDO::PARAM_STR);
-        
-        if($stmt->execute()){
-            $res = $stmt->fetch();
-            $stmt = null;
-            return $res['CANTIDAD'];    // REVISAR
-        } else {
-            LogController::error("Conexion::getCantidadDeIntentosFallidos() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-            return false;
-        }
-        
-    }
-    
-    public function ingresarIntentoFallido($usuario){
-        
-        $fecha = date('Y-m-d H:i:s');
-        $stmt = Conexion::conectar()->prepare("INSERT INTO ACCESO(fecha,usuario,ip,estado) VALUES ('".$fecha."',:usuario,:ip,2);");
-        $stmt->bindParam(":usuario", $usuario, PDO::PARAM_STR);
-        $stmt->bindParam(":ip", $_SERVER['REMOTE_ADDR'], PDO::PARAM_STR);
-        
-        if($stmt->execute()){
-           
-            $stmt = null;
-            return true;   
-        } else {
-            LogController::error("Conexion::ingresarIntentoFallido() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-            $stmt = null;
-            return false;
-        }
-        
-    }
-    
-    public function limpiarIntentosFallidos($usuario){
-        
-        $fecha = date('Y-m-d H:i:s');
-        $stmt = Conexion::conectar()->prepare("DELETE FROM ACCESO WHERE USUARIO = :usuario");
-        $stmt->bindParam(":usuario", $usuario, PDO::PARAM_STR);
-        
-        if($stmt->execute()){
-            
-            $stmt = null;
-            return true;
-        } else {
-            
-            LogController::error("Conexion::limpiarIntentosFallidos() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-            $stmt = null;
-            return false;
-        }
-        
-    }
-    
-    public function bloquearUsuario($usuario){
-        
-        $fecha = date('Y-m-d H:i:s');
-        $stmt = Conexion::conectar()->prepare("UPDATE USUARIO SET ESTADO = -1 WHERE ID = :usuario");
-        $stmt->bindParam(":usuario", $usuario, PDO::PARAM_STR);
-        
-        if($stmt->execute()){
-            
-            $stmt = null;
-            return true;
-        } else {
-            
-            LogController::error("Conexion::bloquearUsuario() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-            $stmt = null;
-            return false;
-        }
-        
-    }
-    
+      
     
     public function cambiarEstado($componente, $estado)
     {
@@ -120,6 +48,33 @@ class Conexion {
             return false;
         }
         
+    }
+   
+   public function reiniciarEstados()
+    {
+        $fecha = date("Y-m-d H:i:s");
+        $stmt = Conexion::conectar()->prepare("update estado_componente set estado=0, fecha=:fecha where id in (2,3,4);");
+        $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+        
+        if($stmt->execute()){
+            $stmt = Conexion::conectar()->prepare("update estado_componente set estado=1, fecha=:fecha where id in (1,5);");
+            $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+            
+            if($stmt->execute()){
+                $stmt = null;
+                return true;
+            } else {
+                LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+                $stmt = null;
+                return false;
+            }
+            
+        } else {
+            LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            $stmt = null;
+            return false;
+        }
+       
     }
    
     public function cambiarPosicionGeografica($latitud, $longitud)

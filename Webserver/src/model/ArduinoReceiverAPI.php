@@ -136,12 +136,32 @@ class ArduinoReceiverAPI{
                             }
                             
                             break;
+                        case REINICIO:
+                            
+                            // Actualizo todos los estados de la DB
+                           
+                            if(Conexion::reiniciarEstados()){
+                                $comentario = "Se acaba de iniciar el dispositivo. Se sincronizan los estados de componentes.";
+                                
+                                // Enviar notificacion
+                                //Conexion::nuevaNotificacion($comentario);
+                                LogController::info($comentario,"LOG_SERVER");
+                                
+                            } else {
+                                // Logueo el error y mando notificacion
+                                $comentarioError = "Hubo un error al actualizar estados de los componentes";
+                                Conexion::nuevaNotificacion($comentarioError);
+                                LogController::error($comentarioError,"LOG_SERVER");
+                            }
+                            
+                            break;
+                            
                         default:
                             // Accion no valida
                             break;
                     }
                     
-                }else {
+                } else {
                     // 400 - solicitud incorrecta
                 }
                 
