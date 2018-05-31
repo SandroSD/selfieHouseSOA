@@ -20,25 +20,25 @@
             app:srcCompat="@drawable/logo" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/btnAcceder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Acceder" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/btnSolicitarAcceso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Solicitar Acceso" />
 
         <Button
-            android:id="@+id/button5"
+            android:id="@+id/btnControlar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Controlar" />
 
         <Button
-            android:id="@+id/button6"
+            android:id="@+id/btnConfiguracion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Configuración" />
