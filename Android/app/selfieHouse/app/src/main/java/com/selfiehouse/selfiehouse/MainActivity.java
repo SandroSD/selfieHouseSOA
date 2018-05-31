@@ -13,7 +13,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
+        getSupportActionBar().setDisplayShowTitleEnabled(false);    // Oculta el nombre de la APP
+        getSupportActionBar().setIcon(R.mipmap.ic_launcher);        // Cambia el icono de la APP
 
         button_Acc = (Button)findViewById(R.id.btnAcceder);
         button_SAcc = (Button)findViewById(R.id.btnSolicitarAcceso);
