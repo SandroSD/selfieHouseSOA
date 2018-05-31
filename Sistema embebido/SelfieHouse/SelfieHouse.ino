@@ -2,7 +2,7 @@
   |--------------------------------------------------------------------------
   | Proyecto      : selfieHouse
   | Version       : 1.0.1
-  | Actualizado   : 24/05/2018
+  | Actualizado   : 26/05/2018
   | Bibliotecas   : Servo, DHT, ESP8266WebServer, ESP8266WiFiMulti, ESP8266mDNS
   | Autores       : ~ Dezerio, Sandro (@SandroSD)
   |                 ~ Jalid, Fernando (@fernandodj)
@@ -92,8 +92,8 @@ WiFiClient client;              // Cliente que avisa al servidor Apache
 
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "WIFi-MT";
-const char* password = "*xeneize1905+";
+const char* ssid = "red";
+const char* password = "*****";
 const char * ipServidorApache = "192.168.1.10";              // Servidor Apache - Hay que disponer de una IP fija
 const uint16_t puertoIpServidorApache = 8080;                  // Puerto Servidor Apache
 
@@ -425,12 +425,12 @@ void desactivarBuzzerWS()
 }
 void activarVentiladorWS()
 {
-  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender ventilador") : false;;
+  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender ventilador") : false;
   activarVentilador();
 }
 void desactivarVentiladorWS()
 {
-  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar buzzer") : false;
+  modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar ventilador") : false;
   desactivarVentilador();
 }
 
@@ -469,7 +469,7 @@ bool iniciarSensores()
   /* Inicializo ventilador */
   estadoVentilador = DESACTIVADO;
   pinMode(pinVentilador, OUTPUT);
-  digitalWrite(pinVentilador, HIGH);
+  digitalWrite(pinVentilador, LOW);
 
   /* Inicializo servo */
   estadoTraba = ACTIVADO;

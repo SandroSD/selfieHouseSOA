@@ -54,10 +54,8 @@ define("ERROR",0);
 define("ID_TRABA",1);
 define("ID_BUZZER",2);
 define("ID_VENTILADOR",3);
-define("ID_LED_AMARILLO",4);
-define("ID_LED_AZUL",5);
-define("ID_LED_ROJO",6);
-define("ID_LED_VERDE",7);
+define("ID_LED_ROJO",4);
+define("ID_LED_VERDE",5);
 
 
 /***************************************
@@ -74,6 +72,7 @@ define("SELFIEHOUSE_DESACTIVADO",1007);
 define("DEBUG_ACTIVADO",1008);
 define("DEBUG_DESACTIVADO",1009);
 define("NUEVA_FOTO",1010);
+define("REINICIO",9999);
 
 /***************************************
  ******** ESTADOS DE DISPARADORES ****************
