@@ -15,4 +15,8 @@
         completions."
     </string>
     <string name="title_activity_solicitar_acceso">Solicitud de Acceso</string>
+    <string name="title_activity_menu_control">MenuControlActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

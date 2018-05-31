@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         getSupportActionBar().setDisplayShowTitleEnabled(false);    // Oculta el nombre de la APP
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);        // Cambia el icono de la APP
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
             public void onClick(View v){
                 // Estoy en MainActivity.this y voy hacia MainActivity.class
-                Intent controlIntent = new Intent (MainActivity.this, ControlActivity.class);
+                Intent controlIntent = new Intent (MainActivity.this, MenuControlActivity.class);
                 startActivity(controlIntent);
             }
 
