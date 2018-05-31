@@ -12,13 +12,13 @@
         <div class="col-3 col-md-3 col-lg-3">
             <input type="text" class="4" name="codigo" readonly>
         </div-->
-        <div class="col-3 col-md-3 col-lg-3">
+        <div class="col-12 col-md-12 col-lg-12">
             <input type="text" class="3" name="codigo" readonly>
             <input type="hidden" name="guardarCodigo">
         </div>        
     </div>
     
-    <div class="row">
+    <!--div class="row">
         <div class="col-4 col-md-4 col-lg-4">
             <button data-val="7" class="btn btn-info ingresoCodigo">7</button>
         </div>
@@ -55,6 +55,14 @@
         <div class="col-4 col-md-4 col-lg-4">
             <button data-val="0" class="btn btn-info ingresoCodigo">0</button>
         </div>
+        <div class="col-4 col-md-4 col-lg-4">
+            <button data-val="borrar" class="btn btn-warning ingresoCodigo">Borrar</button>
+        </div>
+        <div class="col-4 col-md-4 col-lg-4">
+            <button data-val="enviar" class="btn btn-success ingresoCodigo">Enviar</button>
+        </div>
+    </div-->
+    <div class="row">
         <div class="col-4 col-md-4 col-lg-4">
             <button data-val="borrar" class="btn btn-warning ingresoCodigo">Borrar</button>
         </div>

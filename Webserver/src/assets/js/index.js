@@ -153,19 +153,15 @@ function funcionDeCamara(){
     });
     // Upload image to sever 
     document.getElementById("upload").addEventListener("click", function(){
-        var dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-        console.log(dataUrl);
+        var url = canvas.toDataURL("image/jpeg", 0.85);        
         $("#uploading").show();
         $.ajax({
           type: "POST",
-          url: "src/plugins/html5-webcam-save.php",
+          url: "/src/plugins/html5-webcam-save.php",
           data: { 
-             imgBase64: dataUrl,
-             user: "Joe",       
-             userid: 25         
+             url: url                    
           }
-        }).done(function(msg) {
-          console.log("saved");
+        }).done(function(msg) {          
           $("#uploading").hide();
           $("#uploaded").show();
         });

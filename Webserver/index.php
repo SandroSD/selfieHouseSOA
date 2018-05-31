@@ -7,8 +7,9 @@
     <title>selfieHouse</title>
     <link rel="icon" type="image/svg" href="src/assets/plugins/camera.svg"> 
 
-    <!--script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script-->
-    <script src="src/assets/js/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <!--script src="Webserver/src/assets/js/jquery.min.js"></script-->
+    
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
@@ -23,9 +24,6 @@
 </nav>
 <div class="container-fluid">
     <div class="row">
-<<<<<<< HEAD:Android/web/index.php
-                   
-=======
         <div class="col-12 col-md-5 col-lg-5 offset-md-3 offset-lg-3">
             <div class="camcontent">
                 <video id="video" autoplay></video>
@@ -42,7 +40,6 @@
                 </div>
             </div> 
         </div>           
->>>>>>> 4481e8b9a7446b950f3968313d67b2530930a59f:Webserver/index.php
     </div>
 </div>
 
