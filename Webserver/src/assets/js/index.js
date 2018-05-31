@@ -50,45 +50,13 @@ function cargarSeccion(){
     //$(".container-fluid .row").load("src/assets/templates/camara.php");
     $.ajax({
         type: "POST",
-        url: "src/assets/templates/elegirOpcion.php",
+        url: "src/assets/templates/camara.php",
         data: { 
            
         },
         dataType: "html",
         success: function(data){
-            $(".container-fluid .row").html(data);
-            $("#pedirAutorizacion").click(function(){
-                $.ajax({
-                    type: "POST",
-                    url: "src/assets/templates/camara.php",
-                    data: { 
-                    
-                    },
-                    dataType: "html",
-                    success: function(data){
-                        $(".container-fluid .row").html(data);
-                        funcionDeCamara();
-                    }
-                }).done(function(msg) {
-                
-                });
-            });
-            $("#ingresar").click(function(){
-                $.ajax({
-                    type: "POST",
-                    url: "src/assets/templates/ingreso.php",
-                    data: { 
-                    
-                    },
-                    dataType: "html",
-                    success: function(data){
-                        $(".container-fluid .row").html(data);
-                        registrarCodigo();     
-                    }
-                }).done(function(msg) {
-                
-                });
-            });
+            funcionDeCamara();                        
         }
       }).done(function(msg) {
         
@@ -160,10 +128,13 @@ function funcionDeCamara(){
           url: "/src/plugins/html5-webcam-save.php",
           data: { 
              url: url                    
+          },
+          sucess:function(data){
+            
           }
         }).done(function(msg) {          
           $("#uploading").hide();
-          $("#uploaded").show();
+          $("#uploaded").show();          
         });
     });
 }
