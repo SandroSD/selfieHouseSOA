@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MenuControlActivity extends AppCompatActivity {
@@ -35,6 +36,14 @@ public class MenuControlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_control);
+
+        /* Cambio los titulos para que no sean editables*/
+        EditText mEdit = (EditText) findViewById(R.id.titleEstadoActuadores);
+        mEdit.setEnabled(false);
+        mEdit = (EditText) findViewById(R.id.titleEstadoAlertas);
+        mEdit.setEnabled(false);
+        mEdit = (EditText) findViewById(R.id.titleEstadoSistema);
+        mEdit.setEnabled(false);
 
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
