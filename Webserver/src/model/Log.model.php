@@ -20,7 +20,7 @@ class Log {
     public function write($severidad, $texto){
        
         if(!is_writable($this->completeDir)){ 
-            die ("Error al abrir el log");
+           die ("Error al abrir el log");
         }
         $handle = fopen($this->completeDir,'a+');
         fwrite($handle, $severidad."".$texto."\r\n");

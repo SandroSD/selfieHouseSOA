@@ -11,6 +11,7 @@ define("IP_ANDROID","192.168.1.201");   // Creo que no hace falta
  ***************************************/
 
 # Directorio del log
+define("NOMBRE_DIRECTORIO","selfieHouse");
 define("PATH_LOG","C:/xampp/htdocs/".NOMBRE_DIRECTORIO."/log/");
 # Tamaño del log (Cantidad de lineas visualizables en LogView)
 define("LOG_SIZE","50000");
@@ -83,3 +84,9 @@ define("DISPARADOR_LLAMA",2001);
 define("DISPARADOR_TEMPERATURA",2002);
 define("DISPARADOR_LUZ",2003);
 define("DISPARADOR_MANUAL",2003);
+
+/***************************************
+ ******** TIPOS DE ACCESO ****************
+ ***************************************/
+define("ACCESO_SIMPLE",222);
+define("ACCESO_ADMIN",777);
