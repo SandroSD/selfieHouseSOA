@@ -37,6 +37,7 @@
                     <!--span id=uploading> Uploading has begun . . .  </span> 
                     <span id=uploaded> Success, your photo has been uploaded! 
                     <a href="javascript:history.go(-1)"> Return </a> </span-->
+                    <span id="mensaje"></span>
                 </div>
             </div> 
         </div>           

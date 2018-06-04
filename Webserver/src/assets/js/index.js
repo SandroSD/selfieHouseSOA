@@ -113,6 +113,7 @@ function funcionDeCamara(){
     });
     // reset - clear - to Capture New Photo
     document.getElementById("reset").addEventListener("click", function() {
+        $("#mensaje").html("");    
         $("#video").fadeIn("slow");
         $("#canvas").fadeOut("slow");
         $("#snap").show();
@@ -121,18 +122,25 @@ function funcionDeCamara(){
     });
     // Upload image to sever 
     document.getElementById("upload").addEventListener("click", function(){
-        var url = canvas.toDataURL("image/jpeg", 0.85);        
+        var url = canvas.toDataURL("image/jpeg", 0.85);    
+        $("#mensaje").html("");    
         $("#uploading").show();
         $.ajax({
-          type: "POST",
-          url: "/src/plugins/html5-webcam-save.php",
-          data: { 
-             url: url                    
-          },
-          sucess:function(data){
-            
-          }
-        }).done(function(msg) {          
+            type: "POST",
+            url: "src/plugins/html5-webcam-save.php",
+            dataType: "html",
+            data: { 
+                url: url                    
+            },
+            sucess:function(data){
+                
+            }
+        }).done(function(msg) {
+            if(msg=="OK"){
+                $("#mensaje").html("Registro solicitado correcto, aguarde unos instantes");
+            }else{
+                $("#mensaje").html("Error al intentar solicitar el registro, vuelva a intentar mas tarde");
+            }
           $("#uploading").hide();
           $("#uploaded").show();          
         });
