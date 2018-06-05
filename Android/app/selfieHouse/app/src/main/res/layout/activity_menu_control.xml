@@ -11,8 +11,6 @@
         android:id="@+id/navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
         android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -36,7 +34,7 @@
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:text="Estado del sistema"
-                android:textSize="24sp"
+                android:textSize="20sp"
 
                 />
 
@@ -52,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="Sistema"
                 android:textAlignment="textStart"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
         </TableRow>
@@ -67,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="Modo Debug"
                 android:textAlignment="textStart"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
         </TableRow>
@@ -83,7 +81,7 @@
                 android:ems="10"
                 android:inputType="none"
                 android:text="Estado de sensores"
-                android:textSize="24sp" />
+                android:textSize="20sp" />
         </TableRow>
 
         <TableRow
@@ -95,7 +93,7 @@
                 android:layout_width="169dp"
                 android:layout_height="wrap_content"
                 android:text="Temperatura: "
-                android:textSize="18sp" />
+                android:textSize="16sp" />
         </TableRow>
 
         <TableRow
@@ -107,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Detección de movimiento: "
-                android:textSize="18sp" />
+                android:textSize="16sp" />
         </TableRow>
 
         <TableRow
@@ -119,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nivel de luz:"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
         </TableRow>
 
         <TableRow
@@ -131,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Detección de fuego:"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
         </TableRow>
 
@@ -146,7 +144,7 @@
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:text="Estado de los actuadores"
-                android:textSize="24sp" />
+                android:textSize="20sp" />
         </TableRow>
 
         <TableRow
@@ -158,7 +156,7 @@
                 android:layout_width="352dp"
                 android:layout_height="wrap_content"
                 android:text="Ventilador"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
         </TableRow>
@@ -172,7 +170,7 @@
                 android:layout_width="352dp"
                 android:layout_height="wrap_content"
                 android:text="Buzzer"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
         </TableRow>
@@ -186,7 +184,7 @@
                 android:layout_width="352dp"
                 android:layout_height="wrap_content"
                 android:text="Traba"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
         </TableRow>
@@ -202,7 +200,7 @@
                 android:layout_width="352dp"
                 android:layout_height="wrap_content"
                 android:text="LED Verde"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
 
@@ -217,7 +215,7 @@
                 android:layout_width="352dp"
                 android:layout_height="wrap_content"
                 android:text="LED Rojo"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
 

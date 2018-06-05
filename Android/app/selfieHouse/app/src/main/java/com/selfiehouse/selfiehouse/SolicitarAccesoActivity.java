@@ -50,7 +50,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
         WebView webview = new WebView(this);
         setContentView(webview);
         // Aca va la direccion local de la camara
-        webview.loadUrl("https://www.google.com.ar");
+        webview.loadUrl("http://192.168.10.108:8080/selfiehouse/index.php");
         // No hace falta usar un handler o recibir respuesta.
         // En caso que funcione, se deberia encender un led verde y destrabar la puerta.
     }
