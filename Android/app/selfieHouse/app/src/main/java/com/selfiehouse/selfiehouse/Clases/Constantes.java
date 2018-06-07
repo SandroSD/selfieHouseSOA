@@ -7,11 +7,31 @@ public interface Constantes {
     public static final String PUERTO_APACHE = "8080";
 
     /* Actuadores */
+    public static final int CANTIDAD_ESTADOS = 7;
     public static final int ID_TRABA = 1;
     public static final int ID_BUZZER = 2;
     public static final int ID_VENTILADOR = 3;
     public static final int ID_LED_ROJO = 4;
     public static final int ID_LED_VERDE = 5;
+    public static final int ID_SELFIEHOUSE = 6;
+    public static final int ID_DEBUG = 7;
 
-    /* */
+    public static final int PUERTA_TRABADA = 1000;
+    public static final int PUERTA_DESTRABADA = 1001;
+    public static final int BUZZER_ACTIVADO = 1002;
+    public static final int BUZZER_DESACTIVADO = 1003;
+    public static final int VENTILADOR_ACTIVADO = 1004;
+    public static final int VENTILADOR_DESACTIVADO = 1005;
+    public static final int SELFIEHOUSE_ACTIVADO = 1006;
+    public static final int SELFIEHOUSE_DESACTIVADO = 1007;
+    public static final int DEBUG_ACTIVADO = 1008;
+    public static final int DEBUG_DESACTIVADO = 1009;
+    public static final int NUEVA_FOTO = 1010;
+    public static final int REINICIO = 9999;
+
+    public static final int DISPARADOR_MANUAL = 2003;
+
+    public static final int ACTIVADO = 1;
+    public static final int DESACTIVADO = 0;
+
 }

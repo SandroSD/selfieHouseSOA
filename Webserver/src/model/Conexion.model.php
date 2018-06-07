@@ -129,6 +129,34 @@ class Conexion {
 		
 	}
 	
+	public function getEstadosComponentes(){
+		$stmt = Conexion::conectar()->prepare("SELECT id,nombre,estado,fecha FROM estado_componente;");
+		
+		if($stmt->execute()){
+            $datos = $stmt->fetchAll();
+			
+			$array = Array();
+			$i=0;
+			foreach($datos as $dato){
+				$array[$i] = Array();
+				$array[$i]['id'] = $dato['id'];
+				$array[$i]['nombre'] = $dato['nombre'];
+				$array[$i]['estado'] = $dato['estado'];
+				$array[$i]['fecha'] = $dato['fecha'];
+				$i++;
+			}
+			
+			$stmt = null;
+            return $array;
+			
+        } else {
+            LogController::error("Conexion::getEstadosComponentes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            $stmt = null;
+            return false;
+        }
+		
+	}
+	
 	public function getSolicitudesDeAcceso(){
 		$stmt = Conexion::conectar()->prepare("SELECT * FROM acceso_solicitud WHERE estado = 1;");
 		
@@ -146,11 +174,16 @@ class Conexion {
 	}
 	
 	public function getUbicacion(){
-		$stmt = Conexion::conectar()->prepare("SELECT LATITUD, LONGITUD FROM configuracion WHERE id = 1;");
+		$stmt = Conexion::conectar()->prepare("SELECT latitud, longitud FROM configuracion WHERE id = 1;");
 		if($stmt->execute()){
-            $datos = $stmt->fetchAll();
+            $datos = $stmt->fetch();
+			
+			$array = Array();
+			$array['latitud'] = $datos['latitud'];
+			$array['longitud'] = $datos['longitud'];
+			
 			$stmt = null;
-            return $datos;
+            return $array;
 			
         } else {
             LogController::error("Conexion::getUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);

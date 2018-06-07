@@ -12,8 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
+import com.selfiehouse.selfiehouse.Clases.EstadoComponente;
+import com.selfiehouse.selfiehouse.Clases.Respuesta;
 import com.selfiehouse.selfiehouse.Servicios.AccesoSolicitudService;
 import com.selfiehouse.selfiehouse.Clases.Constantes;
+import com.selfiehouse.selfiehouse.Servicios.AccionService;
+import com.selfiehouse.selfiehouse.Servicios.EstadoComponenteService;
 
 import java.util.List;
 
@@ -65,19 +69,117 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        /* Seteo los estados iniciales */
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        EstadoComponenteService servicioEstadoComponente = retrofit.create(EstadoComponenteService.class);
+        Call <List<EstadoComponente>> serviciosEstadosComponentesCall = servicioEstadoComponente.getEstadosComponentes(true);
+        serviciosEstadosComponentesCall.enqueue(new Callback<List<EstadoComponente>>() {
+            @Override
+            public void onResponse(Call<List<EstadoComponente>> call, Response<List<EstadoComponente>> response) {
+                List<EstadoComponente> ec = response.body();
+
+                for (int i = 0 ; i < Constantes.CANTIDAD_ESTADOS; i++){
+                    switch(ec.get(i).getId()){
+                        case Constantes.ID_SELFIEHOUSE:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchSistema.setChecked(true);
+                            }
+                            break;
+                        case Constantes.ID_DEBUG:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchDEBUG.setChecked(true);
+                            }
+                            break;
+
+                        case Constantes.ID_TRABA:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchTraba.setChecked(true);
+                            }
+                            break;
+                        case Constantes.ID_BUZZER:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchBuzzer.setChecked(true);
+                            }
+                            break;
+                        case Constantes.ID_VENTILADOR:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchVentilador.setChecked(true);
+                            }
+                            break;
+                        case Constantes.ID_LED_ROJO:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchLEDRojo.setChecked(true);
+                            }
+                            break;
+                        case Constantes.ID_LED_VERDE:
+                            if(ec.get(i).getEstado() == Constantes.ACTIVADO){
+                                switchLEDVerde.setChecked(true);
+                            }
+                            break;
+
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<EstadoComponente>> call, Throwable throwable) {
+                Toast.makeText(MenuControlActivity.this, "Error al cargar informacion del servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
         /* Listener para switchSistema */
         switchSistema = (Switch) findViewById(R.id.switchSistema);
         switchSistema.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
                 if (bChecked) {
-                    // Nueva peticion HTTP
-                    // SI esta OK, que avise mediante toast
-                    Toast.makeText(MenuControlActivity.this,"selfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
-                    //textView.setText(switchOn);
-                } else {
-                    Toast.makeText(MenuControlActivity.this,"selfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
-                    //textView.setText(switchOff);
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    AccionService servicioAccion = retrofit.create(AccionService.class);
+                    Call<Respuesta> serviciosCall = servicioAccion.enviarAccion(Constantes.SELFIEHOUSE_ACTIVADO,Constantes.DISPARADOR_MANUAL);
+                    serviciosCall.enqueue(new Callback<Respuesta>() {
+                        @Override
+                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                            Toast.makeText(MenuControlActivity.this,"selfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                            switchSistema.setChecked(false);
+                            Toast.makeText(MenuControlActivity.this,"Hubo un error al activar el sistema", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                 } else {
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    AccionService servicioAccion = retrofit.create(AccionService.class);
+                    Call<Respuesta> serviciosCall = servicioAccion.enviarAccion(Constantes.SELFIEHOUSE_DESACTIVADO,Constantes.DISPARADOR_MANUAL);
+                    serviciosCall.enqueue(new Callback<Respuesta>() {
+                        @Override
+                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                            Toast.makeText(MenuControlActivity.this,"selfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                            switchSistema.setChecked(false);
+                            Toast.makeText(MenuControlActivity.this,"Hubo un error al activar el sistema", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

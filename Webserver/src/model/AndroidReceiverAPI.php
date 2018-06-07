@@ -6,7 +6,65 @@ class AndroidReceiverAPI{
         $metodo = $_SERVER['REQUEST_METHOD'];
         
         switch ($metodo) {
-            case 'POST'://inserta
+            case 'GET':
+				
+				if (isset($_GET['pull_solicitudes'])){
+					
+					$solicitudes = Conexion::getSolicitudesDeAcceso();
+					# Hay que ver como conviene mostrarlo, si con echo o return
+					if($solicitudes){
+						//LogController::info("AndroidReceiverAPI:: Se informaron solicitudes de acceso pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
+						echo json_encode($solicitudes);
+					} else {
+						//LogController::warn("AndroidReceiverAPI:: No hay solicitudes",LOG_SERVER);
+						echo "No hay solicitudes";
+					}	
+				} else if (isset($_GET['pull_ubicacion'])){
+					
+					$ubicacion = Conexion::getUbicacion();
+					
+					# Hay que ver como conviene mostrarlo, si con echo o return
+					if($ubicacion){
+						//LogController::info("AndroidReceiverAPI:: Se informo ubicacion del sistema embebido a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_SERVER);
+						echo json_encode($ubicacion);
+					} else {
+						//LogController::warn("AndroidReceiverAPI:: Error al informar la ubicacion del embebido",LOG_SERVER);
+						echo "No está definida la posicion del embebido";
+					}
+				
+				} else if (isset($_GET['pull_estados'])){
+					
+					$estados = Conexion::getEstadosComponentes();
+					
+					
+					if($estados){
+						//LogController::info("AndroidReceiverAPI:: Se informo ubicacion del sistema embebido a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_SERVER);
+						echo json_encode($estados);
+					} else {
+						//LogController::warn("AndroidReceiverAPI:: Error al informar la ubicacion del embebido",LOG_SERVER);
+						echo "Error";
+					}
+				
+				}
+				
+				
+				else if (isset($_GET['pull_notificaciones'])){
+					$notificaciones = Conexion::getNotificacionesPendientes();
+						
+					# Hay que ver como conviene mostrarlo, si con echo o return
+					if($notificaciones){
+						LogController::info("AndroidReceiverAPI:: Se informaron  ".count($notificaciones['ID'])." notificaciones pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
+						echo json_encode($notificaciones);
+					} else {
+						LogController::warn("AndroidReceiverAPI:: No hay notificaciones",LOG_SERVER);
+						echo "No hay notificaciones";
+					}
+				}  
+				
+				break;
+			
+			
+			case 'POST'://inserta
                 
                 if(isset($_POST['accion']) && isset($_POST['disparador'])){
                     
@@ -194,44 +252,7 @@ class AndroidReceiverAPI{
 					}
 				}	
 				# Esto sera accedido por un thread de la aplicacion Android para chequear si hay solicitudes nuevas de acceso
-				else if (isset($_POST['pull_solicitudes'])){
-				
-					$solicitudes = Conexion::getSolicitudesDeAcceso();
-					# Hay que ver como conviene mostrarlo, si con echo o return
-					if($solicitudes){
-						LogController::info("AndroidReceiverAPI:: Se informaron  ".count($solicitudes['ID'])." solicitudes de acceso pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
-						echo json_encode($solicitudes);
-					} else {
-						LogController::warn("AndroidReceiverAPI:: No hay solicitudes",LOG_SERVER);
-						echo "No hay solicitudes";
-				}	
-						
-				# Esto sera accedido por un thread de la aplicacion Android para chequear si hay solicitudes nuevas de acceso		
-				} else if (isset($_POST['pull_notificaciones'])){
-					$notificaciones = Conexion::getNotificacionesPendientes();
-						
-					# Hay que ver como conviene mostrarlo, si con echo o return
-					if($notificaciones){
-						LogController::info("AndroidReceiverAPI:: Se informaron  ".count($notificaciones['ID'])." notificaciones pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
-						echo json_encode($notificaciones);
-					} else {
-						LogController::warn("AndroidReceiverAPI:: No hay notificaciones",LOG_SERVER);
-						echo "No hay notificaciones";
-					}
-				} else if (isset($_POST['pull_ubicacion'])){
-					
-					$ubicacion = Conexion::getUbicacion();
-						
-					# Hay que ver como conviene mostrarlo, si con echo o return
-					if($ubicacion){
-						LogController::info("AndroidReceiverAPI:: Se informo ubicacion del sistema embebido a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_SERVER);
-						echo json_encode($ubicacion);
-					} else {
-						LogController::warn("AndroidReceiverAPI:: Error al informar la ubicacion del embebido",LOG_SERVER);
-						echo "No está definida la posicion del embebido";
-					}
-				
-				} else if (isset($_POST['push_ubicacion']) && isset($_POST['latitud']) && isset($_POST['longitud'])){
+				else if (isset($_POST['push_ubicacion']) && isset($_POST['latitud']) && isset($_POST['longitud'])){
 					
 					$latitud = $_POST['latitud'];
 					$longitud = $_POST['longitud'];

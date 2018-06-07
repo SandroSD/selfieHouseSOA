@@ -8,8 +8,9 @@ Options All -Indexes
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
-RewriteRule ^([0-9]+)$ ws/ws_arduino_res.php?accion=$1
-RewriteRule ^([0-9]+) ws/ws_arduino_res.php?accion=$1&disparador=$2 [L,QSA]
+RewriteRule ^([^\.]+)$ ws/$1.php [NC,L]
+RewriteRule ^([0-9]+)$ ws/ArduinoReceiverWs.php?accion=$1
+RewriteRule ^([0-9]+) ws/ArduinoReceiverWs.php?accion=$1&disparador=$2 [L,QSA]
 
 # 4) Proteger .htaccess de cualquier acceso
 <Files .htaccess>
