@@ -24,15 +24,29 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
+import com.selfiehouse.selfiehouse.Clases.Constantes;
+import com.selfiehouse.selfiehouse.Clases.Ubicacion;
+import com.selfiehouse.selfiehouse.Servicios.AccesoSolicitudService;
+import com.selfiehouse.selfiehouse.Servicios.UbicacionService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -46,13 +60,54 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_solicitar_acceso);
+        final EditText mEdit = (EditText) findViewById(R.id.textoVerificacionUbicacion);
+        /**
+         * Obtengo la ubicacion del sistema embebido
+         *
+         */
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        WebView webview = new WebView(this);
-        setContentView(webview);
-        // Aca va la direccion local de la camara
-        webview.loadUrl("http://192.168.10.108:8080/selfiehouse/index.php");
-        // No hace falta usar un handler o recibir respuesta.
-        // En caso que funcione, se deberia encender un led verde y destrabar la puerta.
+        UbicacionService servicioUbicacion = retrofit.create(UbicacionService.class);
+        Call<Ubicacion> ubicacionCall = servicioUbicacion.getUbicacion(true);
+        ubicacionCall. enqueue(new Callback<Ubicacion>() {
+            @Override
+            public void onResponse(Call<Ubicacion> call, Response<Ubicacion> response) {
+
+                mEdit.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
+
+
+                /**
+                 *
+                 * Aca deberia compararla contra la del GPS
+                 */
+                /*
+                * si sale por verdadero
+                * */
+                //Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
+                //Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                //startActivity(intent);
+
+                /*
+                * si sale por falso
+                * */
+                //mEdit.setText("Debe estar cerca de la casa para poder solicitar acceso");
+
+            }
+
+            @Override
+            public void onFailure(Call<Ubicacion> call, Throwable throwable) {
+                mEdit.setText("Hubo un error al obtener la ubicacion GPS");
+            }
+        });
+
+        /*
+        Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+       */
     }
 
 

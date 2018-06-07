@@ -11,7 +11,19 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MenuControlActivity extends AppCompatActivity {
+import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
+import com.selfiehouse.selfiehouse.Servicios.AccesoSolicitudService;
+import com.selfiehouse.selfiehouse.Clases.Constantes;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class MenuControlActivity extends AppCompatActivity implements Constantes {
 
     private TextView mTextMessage;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba, switchLEDVerde, switchLEDRojo;
@@ -154,8 +166,37 @@ public class MenuControlActivity extends AppCompatActivity {
                 if (bChecked) {
                     // Nueva peticion HTTP
                     // SI esta OK, que avise mediante toast
+
+
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
+                    Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);
+                    serviciosCall.enqueue(new Callback<List<AccesoSolicitud>>() {
+                        @Override
+                        public void onResponse(Call<List<AccesoSolicitud>> call, Response<List<AccesoSolicitud>> response) {
+
+                            List<AccesoSolicitud> as = response.body();
+
+                            for(int i=0; i<as.size();i++){
+                                System.out.println(as.get(i).getId());
+                                System.out.println(as.get(i).getFoto());
+                                System.out.println(as.get(i).getFecha());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<AccesoSolicitud>> call, Throwable throwable) {
+                            System.out.println("Error: "+throwable.getMessage());
+                        }
+                    });
+
                     Toast.makeText(MenuControlActivity.this,"Puerta trabada", Toast.LENGTH_SHORT).show();
-                    //textView.setText(switchOn);
+
+
                 } else {
                     Toast.makeText(MenuControlActivity.this,"Puerta destrabada", Toast.LENGTH_SHORT).show();
                     //textView.setText(switchOff);
