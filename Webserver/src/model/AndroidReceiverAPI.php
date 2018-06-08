@@ -29,7 +29,7 @@ class AndroidReceiverAPI{
 						echo json_encode($ubicacion);
 					} else {
 						//LogController::warn("AndroidReceiverAPI:: Error al informar la ubicacion del embebido",LOG_SERVER);
-						echo "No está definida la posicion del embebido";
+						echo "No estÃ¡ definida la posicion del embebido";
 					}
 				
 				} else if (isset($_GET['pull_estados'])){
@@ -88,29 +88,27 @@ class AndroidReceiverAPI{
                            
                             $comentario = "Se activó la alarma. Disparador: ".Conexion::disparadorLabel($disparador);
                             LogController::info($comentario,LOG_SERVER);
-                                                        
+                            echo "OK";
                             break;
                         case SELFIEHOUSE_DESACTIVADO:
                             $html = file_get_contents("http://".IP_ARDUINO."/selfieoff");
                             $comentario = "Se activó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
                             LogController::info($comentario,LOG_SERVER);
-                            
+                            echo "OK";
                             
                             break;                           
                         case DEBUG_ACTIVADO:
                             $html = file_get_contents("http://".IP_ARDUINO."/debugon");
                             $comentario = "Se activó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
                             LogController::info($comentario,LOG_SERVER);
-                            
+                            echo "OK";
                             break;
                         case DEBUG_DESACTIVADO:
                             
                             $html = file_get_contents("http://".IP_ARDUINO."/debugoff");
                             $comentario = "Se desactivó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
                             LogController::info($comentario,LOG_SERVER);
-                            
-                            break;
-                            
+                            echo "OK";
                             break; 
                         case BUZZER_ACTIVADO:
                             
@@ -119,15 +117,15 @@ class AndroidReceiverAPI{
                             if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO)){
                                 $comentario = "Se encendió el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al encender el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
-                            
-                            break;
                             
                             break;
                         case BUZZER_DESACTIVADO:
@@ -137,16 +135,16 @@ class AndroidReceiverAPI{
                             if(Conexion::cambiarEstado(ID_BUZZER,DESACTIVADO)){
                                 $comentario = "Se apagó el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al apagar el buzzer";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
-                            
-                            break;
-                            
+                          
                             break;
                         case VENTILADOR_ACTIVADO:
                             
@@ -155,12 +153,14 @@ class AndroidReceiverAPI{
                             if(Conexion::cambiarEstado(ID_VENTILADOR,ACTIVADO)){
                                 $comentario = "Se encendió el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al encender el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
                             
                             break;
@@ -169,14 +169,15 @@ class AndroidReceiverAPI{
                             $html = file_get_contents("http://".IP_ARDUINO."/fanoff");
                             
                             if(Conexion::cambiarEstado(ID_VENTILADOR,DESACTIVADO)){
-                                $comentario = "Se apagó el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se apagÃ³ el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
-                                
+                                echo "OK";
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al apagar el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
                             
                             break;
@@ -187,12 +188,14 @@ class AndroidReceiverAPI{
                             if(Conexion::cambiarEstado(ID_TRABA,ACTIVADO)){
                                 $comentario = "Se trabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al trabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
                             
                             break;
@@ -200,19 +203,22 @@ class AndroidReceiverAPI{
                             $html = file_get_contents("http://".IP_ARDUINO."/unlock");
                             
                             if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
-                                $comentario = "Se destrabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se destrabÃ³ la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al destrabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
+                                echo "Error";
                             }
                             
                             break;
                         default:
-							break;
+                            echo "Error";
+                            break;
                     }
                     
                 } 
@@ -232,23 +238,23 @@ class AndroidReceiverAPI{
 						# Cambia el estado de la traba en la base de datos
 						if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
                                 $disparador = DISPARADOR_MANUAL;
-								$comentario = "Se destrabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+								$comentario = "Se destrabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
                                 LogController::info($comentario,LOG_SERVER);
-								return "Autorizado";
+                                echo "Autorizado";
                                 
                             } else {
                                 # Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al destrabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
                                 LogController::error($comentarioError,LOG_SERVER);
-								return "Error";
+                                echo "Error";
                             }
 					} 
 					
 					
 					else {
-						# Esta es la respuesta que recibirá la APP de Android de esta API.
-						return "No Autorizado";
+						# Esta es la respuesta que recibirÃ¡ la APP de Android de esta API.
+					    echo "No Autorizado";
 					}
 				}	
 				# Esto sera accedido por un thread de la aplicacion Android para chequear si hay solicitudes nuevas de acceso
@@ -259,22 +265,40 @@ class AndroidReceiverAPI{
 						
 					if(Conexion::setUbicacion($latitud,$longitud)){
 						LogController::info("AndroidReceiverAPI:: Se definio la ubicacion del sistema embebido desde la IP: ".$_SERVER['REMOTE_ADDR'],LOG_SERVER);
-						return "OK";
+						echo "OK";
 					} else {
 						LogController::error("AndroidReceiverAPI:: Error al setear la ubicacion del embebido",LOG_SERVER);
-						return "Error";
+						echo "Error";
 					}		
 					
-					# Hay que ver como conviene mostrarlo, si con echo o return
-					if($ubicacion){
-						LogController::info("AndroidReceiverAPI:: Se informo la latitud y longitud del sistema embebido a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_SERVER);
-						echo json_encode($ubicacion);
-					} else {
-						LogController::info("AndroidReceiverAPI:: Error al informar la posicion del embebido",LOG_SERVER);
-						echo "No está definida la posicion del embebido";
-					}
 				}
+				/* Se ejecuta ante la solicitud de un nuevo codigo con tipo de acceso.
+				    Se recibe un true en nuevo_codigo y el tipo de acceso solicitado (222 ó 777)
+				    Genera un codigo random de 6 cifras.
+				    Si sale todo OK devuelve ese codigo.
+				*/
+				else if (isset($_POST['nuevo_codigo']) && isset($_POST['tipo_codigo'])){
+				    
+				    $tipo = $_POST['tipo_codigo'];
+				    
+				    // Genera un codigo aleatorio de 6 cifras
+				    do {
+				        
+				        $codigo = Conexion::number_pad(rand(0,999999),6);
+				    
+				    } while(!Conexion::verificarCodigoExistente($codigo));
+				    
+				    if(Conexion::insertarCodigoAcceso($codigo,$tipo)){
+				        echo $codigo;
+				    } else {
+				        echo "Error";
+				    }
+				    
+				}
+				
+				
 				else {
+				    echo "Error";
                     // error 400 -> solicitud incorrecta
                 }
                

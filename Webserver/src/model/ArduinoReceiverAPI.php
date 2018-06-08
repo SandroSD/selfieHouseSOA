@@ -32,7 +32,7 @@ class ArduinoReceiverAPI{
                             
                             if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO))
                             {
-                                $comentario = "Se activó la alarma buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se activo la alarma buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
@@ -166,18 +166,9 @@ class ArduinoReceiverAPI{
                 }
                 
                 break;
-            case 'POST'://inserta
-                echo 'POST';
-                break;
-            case 'PUT'://actualiza
-                echo 'PUT';
-                break;
-            case 'DELETE'://elimina
-                echo 'DELETE';
-                break;
             default://metodo NO soportado
                 // error 404
-                echo 'METODO NO SOPORTADO';
+                echo 'Error';
                 break;
         }
         

@@ -31,7 +31,10 @@ class Conexion {
         return $randomString;
     }
       
-      
+    // FUNCION QUE COLOCA $n CEROS ADELANTE DEL $number RECIBIDO.
+    public function number_pad($number,$n) {
+        return str_pad((int) $number,$n,"0",STR_PAD_LEFT);
+    }
     
     public function cambiarEstado($componente, $estado)
     {
@@ -47,9 +50,41 @@ class Conexion {
             $stmt = null;
             return false;
         }
-        
     }
    
+    public function verificarCodigoExistente($codigo){
+        $stmt = Conexion::conectar()->prepare("select count(1) as cantidad from acceso_codigo where nro=:codigo;");
+        $stmt->bindParam(":codigo", $codigo, PDO::PARAM_INT);
+        
+        if($stmt->execute()){
+            $dato = $stmt->fetch();
+            if($dato['cantidad'] == 0){
+                $stmt = null;
+                return true;
+            }
+        } else {
+            LogController::error("Conexion::verificarCodigoExistente() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+        }
+        $stmt = null;
+        return false;
+    }
+    
+    public function insertarCodigoAcceso($codigo, $tipo){
+        $stmt = Conexion::conectar()->prepare("insert into acceso_codigo (nro,permiso,estado) values (:codigo,:tipo,1);");
+        $stmt->bindParam(":codigo", $codigo, PDO::PARAM_INT);
+        $stmt->bindParam(":tipo", $tipo, PDO::PARAM_INT);
+        
+        if($stmt->execute()){
+            $stmt = null;
+            return true;
+        } else {
+            LogController::error("Conexion::insertarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            $stmt = null;
+            return false;
+        }
+    }
+    
+    
    public function reiniciarEstados()
     {
         $fecha = date("Y-m-d H:i:s");
@@ -117,9 +152,21 @@ class Conexion {
 		$stmt = Conexion::conectar()->prepare("SELECT * FROM notificacion WHERE pendiente = 1;");
 		
 		if($stmt->execute()){
-            $datos = $stmt->fetchAll();
+		    $datos = $stmt->fetchAll();
+		    $array = Array();
+		    $i=0;
+		    foreach($datos as $dato){
+		        $array[$i] = Array();
+		        $array[$i]['id'] = $dato['id'];
+		        $array[$i]['fecha'] = $dato['fecha'];
+		        $array[$i]['comentario'] = $dato['comentario'];
+		        $array[$i]['pendiente'] = $dato['pendiente'];
+		        
+		        $i++;
+		    }
+		    
 			$stmt = null;
-            return $datos;
+			return $array;
 			
         } else {
             LogController::error("Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
@@ -161,9 +208,21 @@ class Conexion {
 		$stmt = Conexion::conectar()->prepare("SELECT * FROM acceso_solicitud WHERE estado = 1;");
 		
 		if($stmt->execute()){
-            $datos = $stmt->fetchAll();
-			$stmt = null;
-            return $datos;
+		    $datos = $stmt->fetchAll();
+		    $array = Array();
+		    $i=0;
+		    foreach($datos as $dato){
+		        $array[$i] = Array();
+		        $array[$i]['id'] = $dato['id'];
+		        $array[$i]['fecha'] = $dato['fecha'];
+		        $array[$i]['foto'] = $dato['foto'];
+		        $array[$i]['estado'] = $dato['estado'];
+		        
+		        $i++;
+		    }
+		    
+		    $stmt = null;
+		    return $array;
 			
         } else {
             LogController::error("Conexion::getSolicitudesDeAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
@@ -263,13 +322,13 @@ class Conexion {
     public function disparadorLabel($disparador)
     {
         if ($disparador == DISPARADOR_MOVIMIENTO){
-            return "Detección de movimiento";
+            return "Detecci�n de movimiento";
         } else if ($disparador == DISPARADOR_LLAMA){
-            return "Detección de llama";
+            return "Detecci�nn de llama";
         } else if ($disparador == DISPARADOR_TEMPERATURA){
             return "Temperatura fuera de rango";
         } else if ($disparador == DISPARADOR_MANUAL){
-            return "Acción Manual";
+            return "Acci�n Manual";
         }  else{
             return "Desconocido";
         }
