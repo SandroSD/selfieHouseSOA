@@ -27,6 +27,10 @@ public interface Constantes {
     public static final int DEBUG_ACTIVADO = 1008;
     public static final int DEBUG_DESACTIVADO = 1009;
     public static final int NUEVA_FOTO = 1010;
+    public static final int LED_ROJO_ENCENDIDO = 1011;
+    public static final int LED_ROJO_APAGADO = 1012;
+    public static final int LED_VERDE_ENCENDIDO = 1013;
+    public static final int LED_VERDE_APAGADO = 1014;
     public static final int REINICIO = 9999;
 
     public static final int DISPARADOR_MANUAL = 2003;
@@ -34,4 +38,6 @@ public interface Constantes {
     public static final int ACTIVADO = 1;
     public static final int DESACTIVADO = 0;
 
+    public static final String RESPUESTA_404 = "Error en respuesta del servidor";
+    public static final String RESPUESTA_ERROR_ACCION = "Hubo un error al completar la acción";
 }
