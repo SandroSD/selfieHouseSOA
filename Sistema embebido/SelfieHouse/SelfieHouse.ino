@@ -18,6 +18,7 @@
 
 /* Bibliotecas */
 #include <DHT.h>
+#include <ArduinoJson.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
@@ -28,7 +29,7 @@
 #define DHTTYPE DHT22
 
 #define MODO_PRODUCTIVO      1
-#define MODO_DEBUG        2
+#define MODO_DEBUG        	 2
 
 #define CANTIDAD_INTENTOS_CONEXION 3
 #define TIMEOUT_CONEXION    10
@@ -53,6 +54,13 @@
 #define DISPARADOR_TEMPERATURA  2002
 #define DISPARADOR_LUZ          2003
 #define DISPARADOR_MANUAL       2004
+
+#define ID_TRABA			1
+#define ID_VENTILADOR		2
+#define ID_BUZZER			3
+#define ID_LED_VERDE		4
+#define ID_LED_ROJO			5
+
 
 /* Modo de ejecucion */
 int estadoSelfieHouse;
@@ -317,15 +325,17 @@ bool iniciarWebserver()
     server.on("/greenoff", pinVerdeOFFWS);
 
     /* Informacion de los sensores */
-    server.on("/info", infoSensores);
+    server.on("/infoSensores", infoSensores);
 
+	/* Informacion de los estados de actuadores */
+    server.on("/infoActuadores", infoActuadores);
+	
     /* Excepcion ante una peticion no reconocida*/
     server.onNotFound(notFound);
 
     /* Inicio el Webserver*/
     server.begin();
     
-    // Enciendo un led de encendido
     delay(300);
 
     return true;
@@ -360,78 +370,94 @@ bool iniciarCliente()
 void activarSelfieHouseWS(){
   Serial.println("Instruccion recibida: Estado selfieHouse ACTIVADO");
   estadoSelfieHouse = ACTIVADO;
+  enviarRespuesta("OK");
 }
 
 void desactivarSelfieHouseWS(){
   Serial.println("Instruccion recibida: Estado selfieHouse DESACTIVADO");
   estadoSelfieHouse = DESACTIVADO;
+  enviarRespuesta("OK");
 }
 
 void activarDebugWS ()
 {
   Serial.println("Instruccion recibida: Modo DEBUG ON");
   modoEjecucion = MODO_DEBUG;
+  enviarRespuesta("OK");
 }
 
 void desactivarDebugWS ()
 {
   Serial.println("Instruccion recibida: Modo DEBUG OFF - Cambio a modo PRODUCCION");
   modoEjecucion = MODO_PRODUCTIVO;
+  enviarRespuesta("OK");
 }
 
 void pinRojoONWS ()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Pin Rojo ON") : false;
   digitalWrite(pinLEDRojo, HIGH);
+  enviarRespuesta("OK");
 }
 
 void pinRojoOFFWS ()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Pin Rojo OFF") : false;
   digitalWrite(pinLEDRojo, LOW);
+  enviarRespuesta("OK");
 }
 
 void pinVerdeONWS ()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Pin Verde ON") : false;
   digitalWrite(pinLEDVerde, HIGH);
+  enviarRespuesta("OK");
 }
 
 void pinVerdeOFFWS ()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Pin Verde OFF") : false;
   digitalWrite(pinLEDVerde, LOW);
+  enviarRespuesta("OK");
 }
 
 void trabarPuertaWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Trabar puerta") : false;
   trabarPuerta();
+  enviarRespuesta("OK");
 }
 void destrabarPuertaWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Destrabar puerta") : false;
+  parpadearLed(pinLEDVerde);
   destrabarPuerta();
+  parpadearLed(pinLEDVerde);
+  enviarRespuesta("OK");
 }
 void activarBuzzerWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender buzzer") : false;
   activarBuzzer();
+  enviarRespuesta("OK");
 }
 void desactivarBuzzerWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar buzzer") : false;
   desactivarBuzzer();
+  enviarRespuesta("OK");
 }
 void activarVentiladorWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Encender ventilador") : false;
   activarVentilador();
+  enviarRespuesta("OK");
 }
 void desactivarVentiladorWS()
 {
   modoEjecucion == MODO_DEBUG ? Serial.println("Instruccion recibida: Apagar ventilador") : false;
   desactivarVentilador();
+  enviarRespuesta("OK");
 }
 
 /*
@@ -450,6 +476,16 @@ void enviarAlServidorWS(int accion, int disparador)
   client.println(contenido);
 }
 
+void enviarRespuesta(String respuesta)
+{
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  json["respuesta"] = respuesta; 
+  
+  String jsonChar;
+  json.prettyPrintTo(jsonChar);
+  server.send(200, "application/json", jsonChar); 
+}
 
 bool iniciarSensores()
 {
@@ -509,10 +545,14 @@ bool evaluarMediciones ()
   /* Evaluo por orden de importancia */
 
   Serial.print("\nNivel de luz: ");
-  if( medicionLuz > 10 && medicionLuz < 2000){
+  if( medicionLuz > 10 && medicionLuz < 1000){
     Serial.println("Bajo");
     
-  } else {
+  } else if (medicionLuz >= 1000 && medicionLuz<2000){
+	  Serial.println("Medio");
+  }
+  
+  else {
     Serial.println("Alto");
     Serial.println("Se analiza el nivel de flama...");
     Serial.print("Nivel de flama: ");
@@ -667,7 +707,6 @@ String mostrarMediciones()
   digitalRead(pinLEDVerde == HIGH) ? contenido += "Encendido" : contenido += "Apagado";
   contenido += "\nEstado Pin Rojo:";
   digitalRead(pinLEDRojo == HIGH) ? contenido += "Encendido" : contenido += "Apagado";  
-  
 
   return contenido;
 }
@@ -756,22 +795,6 @@ void parpadearLed(int pin)
 int medirMovimiento()
 {
   return digitalRead(pinSensorMovimiento) == HIGH ? ACTIVADO : DESACTIVADO;
-  /*
-  if (digitalRead(pinSensorMovimiento) == HIGH)
-  {
-
-
-    return ACTIVADO;
-    //   Serial.println("Detectado movimiento por el sensor pir");
-    //   digitalWrite(led,HIGH);
-    //   delay(1000);
-    //   digitalWrite(led,LOW);
-  }
-  else
-  {
-
-    return DESACTIVADO;
-  }*/
 }
 
 void activarBuzzer()
@@ -791,29 +814,100 @@ void desactivarBuzzer()
 /***************************************************************************
              FUNCIONES DE RESPUESTA DE WEBSERVER
 ***************************************************************************/
-
 void infoSensores()
 {
-  String contenido="";
+  const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(5) + 60;
+  DynamicJsonBuffer jsonBuffer(bufferSize);
+
+  JsonObject& json = jsonBuffer.createObject();
+  JsonObject& s1 = jsonBuffer.createObject();
+
+  s1["nombre"] = "Temperatura";                 
+  s1["valor"] = medicionTemperatura;
+
+  JsonObject& s2 = jsonBuffer.createObject(); 
+
+  s2["nombre"] = "Movimiento";            
+  estadoMovimiento == ACTIVADO ? s2["valor"]= "Hay movimiento" : s2["valor"] = "No hay movimiento";
+  
+  JsonObject& s3 = jsonBuffer.createObject();
+  
+  s3["nombre"] = "Luz";
+  if( medicionLuz > 10 && medicionLuz < 1000){
+    s3["valor"] = "Bajo";
+  } else if (medicionLuz >= 1000 && medicionLuz < 2000){
+    s3["valor"] = "Medio";
+  } else {
+    s3["valor"] = "Alto";
+  }
  
-  contenido += "<!DOCTYPE HTML>";
-  contenido += "<html>";
-  contenido += "<head>";
-  contenido += "<meta name = \"viewport\" content = \"width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0\">";
-  contenido += "<meta charset = \"utf-8\" >";
-  contenido += "<title>selfieHouse</title>";
-  contenido += "<style>";
-  contenido += "\"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }\"";
-  contenido += "</style>";
-  contenido += "</head>";
-  contenido += "<body bgcolor=\"#c5d8b2\">";
+  JsonObject& s4 = jsonBuffer.createObject();
+  s4["nombre"] = "Flama";
+  medicionFlama == HIGH ? s4["valor"] =  "Hay fuego" : s4["valor"] = "No hay fuego";
+  
 
-  contenido += "<h2>Mediciones obtenidas</h2>";
-  contenido += mostrarMediciones();
-  contenido += "</body>";
+  JsonObject& s5 = jsonBuffer.createObject();
+  s5["nombre"] = "Ventilador";
+  digitalRead(pinLEDVerde) == HIGH ? s5["valor"] = "Encendido" : s5["valor"] = "Apagado"; 
 
-  server.send(200, "text/html", contenido);
+  JsonArray& datosS = json.createNestedArray("sensores");
+  datosS.add(s1);
+  datosS.add(s2);
+  datosS.add(s3);
+  datosS.add(s4);
 
+  json.prettyPrintTo(Serial);
+  String jsonChar;
+  json.prettyPrintTo(jsonChar);
+  server.send(200, "application/json", jsonChar); 
+ 
+}
+
+
+void infoActuadores()
+{
+  const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(5) + 60;
+  DynamicJsonBuffer jsonBuffer(bufferSize);
+
+  JsonObject& json = jsonBuffer.createObject();
+  JsonObject& s1 = jsonBuffer.createObject();
+
+  s1["id"] = ID_TRABA;
+  s1["nombre"] = "Traba";                 
+  estadoTraba == ACTIVADO ? s1["valor"] = "Encendida" : s1["valor"] = "Apagada";
+
+  JsonObject& s2 = jsonBuffer.createObject(); 
+
+  s2["id"] = ID_BUZZER;
+  s2["nombre"] = "Buzzer";            
+  estadoBuzzer == ACTIVADO ? s2["valor"] = "Encendido" : s2["valor"] = "Apagado";
+
+  JsonObject& s3 = jsonBuffer.createObject();
+  s3["id"] = ID_VENTILADOR;
+  s3["nombre"] = "Ventilador";
+  estadoVentilador == ACTIVADO ? s3["valor"] = "Encendido" : s3["valor"] = "Apagado";
+
+  JsonObject& s4 = jsonBuffer.createObject();
+  s4["id"] = ID_LED_ROJO;
+  s4["nombre"] = "Ventilador";
+  digitalRead(pinLEDRojo) == HIGH ? s4["valor"] = "Encendido" : s4["valor"] = "Apagado"; 
+
+  JsonObject& s5 = jsonBuffer.createObject();
+  s5["id"] = ID_LED_VERDE;
+  s5["nombre"] = "Ventilador";
+  digitalRead(pinLEDVerde) == HIGH ? s5["valor"] = "Encendido" : s5["valor"] = "Apagado"; 
+
+  JsonArray& datosS = json.createNestedArray("actuadores");
+  datosS.add(s1);
+  datosS.add(s2);
+  datosS.add(s3);
+  datosS.add(s4);
+  datosS.add(s5);
+
+  json.prettyPrintTo(Serial);
+  String jsonChar;
+  json.prettyPrintTo(jsonChar);
+  server.send(200, "application/json", jsonChar);
 }
 
 void notFound()
