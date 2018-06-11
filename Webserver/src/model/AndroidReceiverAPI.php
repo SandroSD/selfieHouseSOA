@@ -2,7 +2,7 @@
 class AndroidReceiverAPI{
 
     public function API(){
-        
+        ini_set('default_socket_timeout', 120);		// 120 segundos
         $metodo = $_SERVER['REQUEST_METHOD'];
         
         switch ($metodo) {
@@ -29,7 +29,7 @@ class AndroidReceiverAPI{
 						echo json_encode($ubicacion);
 					} else {
 						//LogController::warn("AndroidReceiverAPI:: Error al informar la ubicacion del embebido",LOG_SERVER);
-						echo "No estÃ¡ definida la posicion del embebido";
+						echo "No esta definida la posicion del embebido";
 					}
 				
 				} else if (isset($_GET['pull_estados'])){
@@ -53,23 +53,17 @@ class AndroidReceiverAPI{
 						
 					# Hay que ver como conviene mostrarlo, si con echo o return
 					if($notificaciones){
-						LogController::info("AndroidReceiverAPI:: Se informaron  ".count($notificaciones['ID'])." notificaciones pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
+						//LogController::info("AndroidReceiverAPI:: Se informaron  ".count($notificaciones['ID'])." notificaciones pendientes a la IP: ".$_SERVER['REMOTE_ADDR'],LOG_DB);
 						echo json_encode($notificaciones);
 					} else {
-						LogController::warn("AndroidReceiverAPI:: No hay notificaciones",LOG_SERVER);
+						//LogController::warn("AndroidReceiverAPI:: No hay notificaciones",LOG_SERVER);
 						echo "No hay notificaciones";
 					}
-				}  
-				
-				break;
-			
-			
-			case 'POST'://inserta
-                
-                if(isset($_POST['accion']) && isset($_POST['disparador'])){
+				}   
+				else if(isset($_GET['accion']) && isset($_GET['disparador'])){
                     
-                    $accion = $_POST['accion'];
-                    $disparador = $_POST['disparador'];
+                    $accion = $_GET['accion'];
+                    $disparador = $_GET['disparador'];
                     
                     switch ($accion){
                         
@@ -84,146 +78,206 @@ class AndroidReceiverAPI{
                             break;
                         case SELFIEHOUSE_ACTIVADO:
                             $html = file_get_contents("http://".IP_ARDUINO."/selfieon");
-                            // habria que controlar si se hizo la accion.
-                           
-                            $comentario = "Se activó la alarma. Disparador: ".Conexion::disparadorLabel($disparador);
-                            LogController::info($comentario,LOG_SERVER);
-                            echo "OK";
-                            break;
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								$comentario = "Se activo la alarma selfieHouse. Disparador: ".Conexion::disparadorLabel($disparador);
+								echo "OK";
+							} else {
+								echo "Error";
+								
+							}
+							
                         case SELFIEHOUSE_DESACTIVADO:
                             $html = file_get_contents("http://".IP_ARDUINO."/selfieoff");
-                            $comentario = "Se activó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
-                            LogController::info($comentario,LOG_SERVER);
-                            echo "OK";
-                            
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								$comentario = "Se desactivo la alarma selfieHouse. Disparador: ".Conexion::disparadorLabel($disparador);
+								echo "OK";
+							} else {
+								echo "Error";
+								
+							}
+							                            
                             break;                           
                         case DEBUG_ACTIVADO:
                             $html = file_get_contents("http://".IP_ARDUINO."/debugon");
-                            $comentario = "Se activó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
-                            LogController::info($comentario,LOG_SERVER);
-                            echo "OK";
-                            break;
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								$comentario = "Se activo el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
+								echo "OK";
+							} else {
+								echo "Error";
+								
+							}
+							break;
                         case DEBUG_DESACTIVADO:
-                            
                             $html = file_get_contents("http://".IP_ARDUINO."/debugoff");
-                            $comentario = "Se desactivó el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
-                            LogController::info($comentario,LOG_SERVER);
-                            echo "OK";
-                            break; 
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								$comentario = "Se desactivo el modo DEBUG. Disparador: ".Conexion::disparadorLabel($disparador);
+								echo "OK";
+							} else {
+								echo "Error";
+								
+							}
+							break;
+							
                         case BUZZER_ACTIVADO:
                             
                             $html = file_get_contents("http://".IP_ARDUINO."/buzzon");
-                            
-                            if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO)){
-                                $comentario = "Se encendió el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
-                                echo "OK";
-                                
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al encender el ventilador";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
+                            $rta = json_decode($html);
+                            if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_BUZZER,ACTIVADO)){
+									$comentario = "Se encendió el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
+								//    LogController::info($comentario,LOG_SERVER);
+									echo "OK";
+									
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al encender el ventilador";
+									Conexion::nuevaNotificacion($comentarioError);
+								//    LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+							else {
+								echo "Error";
+								
+							}
                             
                             break;
                         case BUZZER_DESACTIVADO:
                             
                             $html = file_get_contents("http://".IP_ARDUINO."/buzzoff");
-                            
-                            if(Conexion::cambiarEstado(ID_BUZZER,DESACTIVADO)){
-                                $comentario = "Se apagó el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
-                                echo "OK";
-                                
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al apagar el buzzer";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
-                          
+                            $rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_BUZZER,DESACTIVADO)){
+									$comentario = "Se apagó el buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
+								   // LogController::info($comentario,LOG_SERVER);
+									echo "OK";
+									
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al apagar el buzzer";
+									Conexion::nuevaNotificacion($comentarioError);
+								 //   LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+							else {
+								echo "Error";
+								
+							}
                             break;
                         case VENTILADOR_ACTIVADO:
                             
                             $html = file_get_contents("http://".IP_ARDUINO."/fanon");
-                            
-                            if(Conexion::cambiarEstado(ID_VENTILADOR,ACTIVADO)){
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_VENTILADOR,ACTIVADO)){
                                 $comentario = "Se encendió el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
+                              //  LogController::info($comentario,LOG_SERVER);
                                 echo "OK";
                                 
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al encender el ventilador";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al encender el ventilador";
+									Conexion::nuevaNotificacion($comentarioError);
+								 //   LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+								
+							} else {
+								echo "Error";
+								
+							}
+							
+							
+                            
                             
                             break;
                         case VENTILADOR_DESACTIVADO:
                             
                             $html = file_get_contents("http://".IP_ARDUINO."/fanoff");
-                            
-                            if(Conexion::cambiarEstado(ID_VENTILADOR,DESACTIVADO)){
-                                $comentario = "Se apagÃ³ el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_VENTILADOR,DESACTIVADO)){
+                                $comentario = "Se apago el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
+                              //  LogController::info($comentario,LOG_SERVER);
                                 echo "OK";
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al apagar el ventilador";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
-                            
+                                
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al encender el ventilador";
+									Conexion::nuevaNotificacion($comentarioError);
+								 //   LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+								
+							} else {
+								echo "Error";
+								
+							}
+						                           
                             break;
                         case PUERTA_TRABADA:
-                            
                             $html = file_get_contents("http://".IP_ARDUINO."/lock");
-                            
-                            if(Conexion::cambiarEstado(ID_TRABA,ACTIVADO)){
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_TRABA,ACTIVADO)){
                                 $comentario = "Se trabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
+                              //  LogController::info($comentario,LOG_SERVER);
                                 echo "OK";
                                 
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al trabar la puerta";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
-                            
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al encender el ventilador";
+									Conexion::nuevaNotificacion($comentarioError);
+								 //   LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+								
+							} else {
+								echo "Error";
+								
+							}
+						                           
                             break;
+							
                         case PUERTA_DESTRABADA:
                             $html = file_get_contents("http://".IP_ARDUINO."/unlock");
-                            
-                            if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
-                                $comentario = "Se destrabÃ³ la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
-                                LogController::info($comentario,LOG_SERVER);
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
+								if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
+                                $comentario = "Se destrabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+                              //  LogController::info($comentario,LOG_SERVER);
                                 echo "OK";
                                 
-                            } else {
-                                // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al destrabar la puerta";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,LOG_SERVER);
-                                echo "Error";
-                            }
-                            
+								} else {
+									// Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al encender el ventilador";
+									Conexion::nuevaNotificacion($comentarioError);
+								 //   LogController::error($comentarioError,LOG_SERVER);
+									echo "Error";
+								}
+								
+							} else {
+								echo "Error";
+								
+							}
+						                           
                             break;
+							
                         default:
                             echo "Error";
                             break;
                     }
                     
                 } 
+				break;
+				
+				case 'POST':
+				
 				# Con esto controlo el login a la casa, puede ser acceso de puerta o acceso al administrador
-				else if (isset($_POST['codigo_acceso']) && isset($_POST['tipo_acceso'])){
+				if (isset($_POST['codigo_acceso']) && isset($_POST['tipo_acceso'])){
 					$nro = $_POST['codigo_acceso'];
 					$tipoAcceso = $_POST['tipo_acceso'];
 					

@@ -73,7 +73,7 @@ define("SELFIEHOUSE_DESACTIVADO",1007);
 define("DEBUG_ACTIVADO",1008);
 define("DEBUG_DESACTIVADO",1009);
 define("NUEVA_FOTO",1010);
-define("REINICIO",9999);
+define("REINICIO_ESTADOS",9999);
 
 /***************************************
  ******** ESTADOS DE DISPARADORES ****************
