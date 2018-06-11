@@ -76,8 +76,10 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
             @Override
             public void onResponse(Call<Ubicacion> call, Response<Ubicacion> response) {
 
-                mEdit.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
+                double  longitudSE = response.body().getLongitud();
 
+
+                mEdit.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
 
                 /**
                  *

@@ -7,8 +7,8 @@ public class EstadoComponente {
 
     public EstadoComponente(int id, String nombre, int estado,  String fecha) {
         this.id = id;
-        this.estado = estado;
         this.nombre = nombre;
+        this.estado = estado;
         this.fecha = fecha;
     }
 

@@ -195,29 +195,11 @@
             tools:layout_editor_absoluteX="360dp"
             tools:layout_editor_absoluteY="332dp">
 
-            <Switch
-                android:id="@+id/switchLEDVerde"
-                android:layout_width="352dp"
-                android:layout_height="wrap_content"
-                android:text="LED Verde"
-                android:textSize="16sp"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="16dp" />
-
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <Switch
-                android:id="@+id/switchLEDRojo"
-                android:layout_width="352dp"
-                android:layout_height="wrap_content"
-                android:text="LED Rojo"
-                android:textSize="16sp"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="16dp" />
 
         </TableRow>
     </TableLayout>
