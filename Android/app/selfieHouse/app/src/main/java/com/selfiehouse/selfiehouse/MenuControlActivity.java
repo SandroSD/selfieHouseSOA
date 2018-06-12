@@ -1,9 +1,16 @@
 package com.selfiehouse.selfiehouse;
 
+import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -30,6 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MenuControlActivity extends AppCompatActivity implements Constantes {
 
     private TextView mTextMessage;
+    private MenuItem cantidadDeSolicitudes;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -56,6 +64,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //getActionBar().setIcon(R.drawable.my_icon);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);      // No permite que la activity se adapte a la rotacion de pantalla
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_control);
         final Retrofit retrofit = new Retrofit.Builder()
@@ -73,8 +83,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mEdit.setEnabled(false);
 
         mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        final BottomNavigationView[] navigation = {(BottomNavigationView) findViewById(R.id.navigation)};
+        navigation[0].setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         /* Seteo los estados iniciales de los botones switch */
 
@@ -384,6 +394,46 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                         }
                     });
                 }
+            }
+        });
+
+
+        /* Obtengo la cantidad de solicitudes*/
+        AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
+        Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);
+        serviciosCall.enqueue(new Callback<List<AccesoSolicitud>>() {
+            @Override
+            public void onResponse(Call<List<AccesoSolicitud>> call, Response<List<AccesoSolicitud>> response) {
+
+                List<AccesoSolicitud> as = response.body();
+                //cantidadDeSolicitudes = (TextView) findViewById(R.id.textCantidadDeSolicitudes);
+                //cantidadDeSolicitudes.setText("Solicitudes: "+as.size());
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
+
+                final EditText et = new EditText(MenuControlActivity.this);
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(et);
+
+                // set dialog message
+                alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                // show it
+                alertDialog.show();
+                System.out.println("Solicitudes ( "+as.size()+")");
+              //  cantidadDeSolicitudes.setTitle("Solicitudes ( "+as.size()+")");
+                //cantidadDeSolicitudes.setText("Solicitudes ( "+as.size()+")");
+            }
+
+            @Override
+            public void onFailure(Call<List<AccesoSolicitud>> call, Throwable throwable) {
+                System.out.println("Error: "+throwable.getMessage());
             }
         });
     }
