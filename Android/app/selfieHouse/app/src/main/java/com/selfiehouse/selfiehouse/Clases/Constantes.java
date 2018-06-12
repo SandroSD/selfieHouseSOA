@@ -40,4 +40,7 @@ public interface Constantes {
 
     public static final String RESPUESTA_404 = "Error en respuesta del servidor";
     public static final String RESPUESTA_ERROR_ACCION = "Hubo un error al completar la acción";
+
+    public static final int ACCESO_NORMAL = 222;
+    public static final int ACCESO_CONTROL = 777;
 }
