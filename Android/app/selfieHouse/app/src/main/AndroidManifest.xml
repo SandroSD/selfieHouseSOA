@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.selfiehouse.selfiehouse">
 
-
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
+    <!-- PARA GPS -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,15 +25,13 @@
         </activity>
         <activity android:name=".ConfiguracionActivity" />
         <activity
-            android:name=".AccesoActivity"
-            android:label="@string/title_activity_acceso" />
-        <activity
             android:name=".SolicitarAccesoActivity"
             android:label="@string/title_activity_solicitar_acceso" />
         <activity android:name=".ControlActivity" />
         <activity
             android:name=".MenuControlActivity"
-            android:label="@string/title_activity_menu_control"></activity>
+            android:label="@string/title_activity_menu_control" />
+        <activity android:name=".AccesoActivity"></activity>
     </application>
 
 </manifest>

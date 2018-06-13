@@ -5,10 +5,9 @@ public class AccesoSolicitud {
     private int id;
     private String fecha, foto;
 
-    public AccesoSolicitud(int ID, String FECHA, String FOTO) {
+    public AccesoSolicitud(int ID, String FECHA) {
         this.id = ID;
         this.fecha = FECHA;
-        this.foto = FOTO;
     }
 
     public int getId() {
@@ -25,13 +24,5 @@ public class AccesoSolicitud {
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
-    }
-
-    public String getFoto() {
-        return foto;
-    }
-
-    public void setFoto(String foto) {
-        this.foto = foto;
     }
 }

@@ -36,13 +36,15 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                                //LogController::info($comentario,"LOG_SERVER");
+								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al activar la alarma buzzer";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                                //LogController::error($comentarioError,"LOG_SERVER");
+								echo "Error";
                             }
                             
                             break;
@@ -50,17 +52,19 @@ class ArduinoReceiverAPI{
                             
                             // Actualizo estado en DB
                             if(Conexion::cambiarEstado(ID_BUZZER,DESACTIVADO)){
-                                $comentario = "Se desactivó la alarma buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se desactivo la alarma buzzer. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                                //LogController::info($comentario,"LOG_SERVER");
+								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al desactivar la alarma buzzer";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                                //LogController::error($comentarioError,"LOG_SERVER");
+								echo "Error";
                             }
                             
                             break;
@@ -68,17 +72,19 @@ class ArduinoReceiverAPI{
                             
                             // Actualizo estado en DB
                             if(Conexion::cambiarEstado(ID_VENTILADOR,ACTIVADO)){
-                                $comentario = "Se activó el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se activo el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                                //LogController::info($comentario,"LOG_SERVER");
+								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al activar el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                                //LogController::error($comentarioError,"LOG_SERVER");
+								echo "Error";
                             }
                             
                             break;
@@ -86,17 +92,19 @@ class ArduinoReceiverAPI{
                             
                             // Actualizo estado en DB
                             if(Conexion::cambiarEstado(ID_VENTILADOR,DESACTIVADO)){
-                                $comentario = "Se desactivó el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se desactivo el ventilador. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                                //LogController::info($comentario,"LOG_SERVER");
+								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al desactivar el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                                //LogController::error($comentarioError,"LOG_SERVER");
+								echo "Error";
                             }
                             
                             break;
@@ -104,17 +112,19 @@ class ArduinoReceiverAPI{
                             
                             // Actualizo estado en DB
                             if(Conexion::cambiarEstado(ID_TRABA,ACTIVADO)){
-                                $comentario = "Se trabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se trabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                                //LogController::info($comentario,"LOG_SERVER");
+								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al trabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                               // LogController::error($comentarioError,"LOG_SERVER");
+							   echo "Error";
                             }
                             
                             break;
@@ -122,21 +132,23 @@ class ArduinoReceiverAPI{
                             
                             // Actualizo estado en DB
                             if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
-                                $comentario = "Se destrabó la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+                                $comentario = "Se destrabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                               // LogController::info($comentario,"LOG_SERVER");
+							   echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al destrabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                               // LogController::error($comentarioError,"LOG_SERVER");
+							   echo "Error";
                             }
                             
                             break;
-                        case REINICIO:
+                        case REINICIO_ESTADOS:
                             
                             // Actualizo todos los estados de la DB
                            
@@ -145,28 +157,32 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 //Conexion::nuevaNotificacion($comentario);
-                                LogController::info($comentario,"LOG_SERVER");
+                               // LogController::info($comentario,"LOG_SERVER");
+							   echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
-                                $comentarioError = "Hubo un error al actualizar estados de los componentes";
-                                Conexion::nuevaNotificacion($comentarioError);
-                                LogController::error($comentarioError,"LOG_SERVER");
+                                //$comentarioError = "Hubo un error al actualizar estados de los componentes";
+                                //Conexion::nuevaNotificacion($comentarioError);
+								echo "Error";
+                               // LogController::error($comentarioError,"LOG_SERVER");
                             }
                             
                             break;
                             
                         default:
                             // Accion no valida
+							echo "Error";
                             break;
                     }
                     
                 } else {
                     // 400 - solicitud incorrecta
+					echo "Error";
                 }
                 
                 break;
-            default://metodo NO soportado
+            default: //metodo NO soportado
                 // error 404
                 echo 'Error';
                 break;

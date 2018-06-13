@@ -12,7 +12,7 @@ class Conexion {
             
             return $link;
         } catch(PDOException $e){
-            LogController::critical("Conexion::conectar() - Error al conectarse a la base de datos: ".$e->getMessage(),LOG_DB);
+            //LogController::critical("Conexion::conectar() - Error al conectarse a la base de datos: ".$e->getMessage(),LOG_DB);
             exit;         
             
         }
@@ -46,7 +46,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            LogController::error("Conexion::cambiarEstado() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::cambiarEstado() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -63,7 +63,7 @@ class Conexion {
                 return true;
             }
         } else {
-            LogController::error("Conexion::verificarCodigoExistente() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::verificarCodigoExistente() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
         }
         $stmt = null;
         return false;
@@ -78,7 +78,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            LogController::error("Conexion::insertarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::insertarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -88,28 +88,35 @@ class Conexion {
    public function reiniciarEstados()
     {
         $fecha = date("Y-m-d H:i:s");
-        $stmt = Conexion::conectar()->prepare("update estado_componente set estado=0, fecha=:fecha where id in (2,3,4);");
-        $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
-        
-        if($stmt->execute()){
-            $stmt = Conexion::conectar()->prepare("update estado_componente set estado=1, fecha=:fecha where id in (1,5);");
-            $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
-            
-            if($stmt->execute()){
-                $stmt = null;
-                return true;
-            } else {
-                LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-                $stmt = null;
-                return false;
-            }
-            
-        } else {
-            LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
-            $stmt = null;
-            return false;
-        }
-       
+        $stmt = Conexion::conectar()->prepare("SET SQL_SAFE_UPDATES = 0;");
+		if($stmt->execute()){
+			$stmt = Conexion::conectar()->prepare("update estado_componente set estado=0, fecha=:fecha;");
+			$stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+			
+			if($stmt->execute()){
+				$stmt = Conexion::conectar()->prepare("update estado_componente set estado=1, fecha=:fecha where id in (1,5);");
+				$stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+				
+				if($stmt->execute()){
+					$stmt = null;
+					return true;
+				} else {
+					//LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+					$stmt = null;
+					return false;
+				}
+				
+			} else {
+				//LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+				$stmt = null;
+				return false;
+			}
+		}
+		else {
+			$stmt = null;
+				return false;
+		}
+		
     }
    
     public function cambiarPosicionGeografica($latitud, $longitud)
@@ -122,7 +129,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            LogController::error("Conexion::cambiarPosicionGeografica() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::cambiarPosicionGeografica() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -132,16 +139,14 @@ class Conexion {
      
     public function nuevaNotificacion($comentario)
     {
-        $stmt = Conexion::conectar()->prepare("insert into notificacion(fecha,comentario,pendiente) VALUES (:fecha,:comentario,:pendiente);");
-        $stmt->bindParam(":pendiente", 1, PDO::PARAM_INT);
+        $stmt = Conexion::conectar()->prepare("insert into notificacion(comentario,pendiente) VALUES (:comentario,1);");
         $stmt->bindParam(":comentario", $comentario, PDO::PARAM_STR);
-        $stmt->bindParam(":fecha", date("Y-m-d H:i:s"), PDO::PARAM_STR);
         
         if($stmt->execute()){
             $stmt = null;
             return true;
         } else {
-            LogController::error("Conexion::nuevaNotificacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::nuevaNotificacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -169,7 +174,7 @@ class Conexion {
 			return $array;
 			
         } else {
-            LogController::error("Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -197,7 +202,7 @@ class Conexion {
             return $array;
 			
         } else {
-            LogController::error("Conexion::getEstadosComponentes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::getEstadosComponentes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -225,7 +230,7 @@ class Conexion {
 		    return $array;
 			
         } else {
-            LogController::error("Conexion::getSolicitudesDeAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::getSolicitudesDeAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -245,7 +250,7 @@ class Conexion {
             return $array;
 			
         } else {
-            LogController::error("Conexion::getUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::getUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -261,7 +266,7 @@ class Conexion {
             return true;
 			
         } else {
-            LogController::error("Conexion::setUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::setUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }
@@ -277,14 +282,14 @@ class Conexion {
             $datos = $stmt->fetch();
 			if(!$datos){
 				# El codigo ingresado no existe en la BD
-				LogController::error("Conexion::verificarCodigoAcceso() - No hay datos",LOG_DB);
+				//LogController::error("Conexion::verificarCodigoAcceso() - No hay datos",LOG_DB);
 				$stmt = null;
 				return false;
 			} else {
 				if($datos["ESTADO"] == ACTIVADO){
 					if($tipoDeAccesoAVerificar == ACCESO_ADMIN){
 						# Verifique TODO OK. El acceso es de Admin, el codigo sigue teniendo vigencia, por ende no le cambio el estado
-						LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
+						//LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
 						$stmt = null;
 						return true;
 					} else {
@@ -294,25 +299,25 @@ class Conexion {
 						$stmt->bindParam(":nro", $nro, PDO::PARAM_INT);
 						if($stmt->execute()){
 							# Verifique TODO OK. El acceso es Simple, el codigo ya no tiene vigencia, por ende le cambio el estado, pero falla la query
-							LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
+							//LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
 							$stmt = null;
 							return true;
 						} else {
-							LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+							//LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
 							$stmt = null;
 							return false;
 						}
 					}
 				} else {
 					# El codigo existe, pero ya fue utilizado
-					LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+					//LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
 					$stmt = null;
 					return false;
 				}
 			}
 			
         } else {
-            LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            //LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
             $stmt = null;
             return false;
         }

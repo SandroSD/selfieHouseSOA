@@ -71,38 +71,38 @@ REPLACE INTO `configuracion` (`id`, `latitud`, `longitud`) VALUES
 CREATE TABLE IF NOT EXISTS `estado_componente` (
   `id` int(11) NOT NULL,
   `nombre` varchar(50) DEFAULT NULL,
-  `estado` int(11) DEFAULT NULL,
+  `estado` int(11) NOT NULL,
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY `ID` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Volcando datos para la tabla db_selfiehouse.estado_componente: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla db_selfiehouse.estado_componente: ~7 rows (aproximadamente)
 /*!40000 ALTER TABLE `estado_componente` DISABLE KEYS */;
 REPLACE INTO `estado_componente` (`id`, `nombre`, `estado`, `fecha`) VALUES
-	(1, 'Traba', 1, '2018-06-07 13:57:03'),
-	(2, 'Buzzer', 1, '2018-06-07 13:57:06'),
-	(3, 'Ventilador', 0, '2018-06-06 14:50:38'),
-	(4, 'Led Rojo', 0, '2018-06-06 14:50:50'),
-	(5, 'Led Verde', 1, '2018-06-07 13:57:07'),
-	(6, 'SelfieHouse', 0, '2018-06-07 15:31:16'),
-	(7, 'Debug', 0, '2018-06-07 15:31:24');
+	(1, 'Traba', 1, '2018-06-11 05:12:20'),
+	(2, 'Buzzer', 0, '2018-06-11 05:12:20'),
+	(3, 'Ventilador', 0, '2018-06-11 05:12:20'),
+	(4, 'Led Rojo', 0, '2018-06-11 05:12:20'),
+	(5, 'Led Verde', 1, '2018-06-11 05:12:20'),
+	(6, 'SelfieHouse', 0, '2018-06-11 05:12:20'),
+	(7, 'Debug', 0, '2018-06-11 05:12:20');
 /*!40000 ALTER TABLE `estado_componente` ENABLE KEYS */;
 
 -- Volcando estructura para tabla db_selfiehouse.notificacion
 CREATE TABLE IF NOT EXISTS `notificacion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fecha` datetime DEFAULT NULL,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `comentario` varchar(255) DEFAULT NULL,
   `pendiente` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
--- Volcando datos para la tabla db_selfiehouse.notificacion: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla db_selfiehouse.notificacion: ~0 rows (aproximadamente)
 /*!40000 ALTER TABLE `notificacion` DISABLE KEYS */;
 REPLACE INTO `notificacion` (`id`, `fecha`, `comentario`, `pendiente`) VALUES
-	(14, '2018-05-12 23:22:33', 'Se activÃƒÂ³ la alarma buzzer. Disparador: DetecciÃƒÂ³n de movimiento', 1),
-	(15, '2018-05-12 23:22:41', 'Se activÃƒÂ³ la alarma buzzer. Disparador: DetecciÃƒÂ³n de movimiento', 1),
-	(16, '2018-05-12 23:28:23', 'Se activÃƒÂ³ la alarma buzzer. Disparador: DetecciÃƒÂ³n de movimiento', 1);
+	(1, '2018-06-11 00:03:33', 'asdas', 1),
+	(2, '2018-06-11 00:04:17', 'Se activo el ventilador. Disparador: Acciï¿½n Manual', 1),
+	(3, '2018-06-11 00:05:03', 'Se destrabo la puerta. Disparador: Acciï¿½n Manual', 1);
 /*!40000 ALTER TABLE `notificacion` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

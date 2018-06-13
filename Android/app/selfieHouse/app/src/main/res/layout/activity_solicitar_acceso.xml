@@ -20,4 +20,11 @@
         android:editable="false"
         android:ems="10"
         android:inputType="none|text" />
+
+    <TextView
+        android:id="@+id/textViewGPS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:editable="false"
+        android:text="TextView" />
 </LinearLayout>
