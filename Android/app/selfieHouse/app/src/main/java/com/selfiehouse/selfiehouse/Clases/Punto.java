@@ -1,4 +1,4 @@
-package formas;
+package com.selfiehouse.selfiehouse.Clases;
 
 public class Punto {
 
@@ -11,7 +11,15 @@ public class Punto {
 	}
 
 	public double distanciaCon(Punto punto) {
-		return Math.sqrt( Math.pow(this.x - punto.x, 2)
+	    return Math.sqrt( Math.pow(this.x - punto.x, 2)
 				+ Math.pow(this.y - punto.y, 2));
+	}
+
+	@Override
+	public String toString() {
+		return "Punto{" +
+				"lat=" + x +
+				", long=" + y +
+				'}';
 	}
 }

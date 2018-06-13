@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 // Estoy en MainActivity.this y voy hacia MainActivity.class
                 Intent accesoIntent = new Intent (MainActivity.this, AccesoActivity.class);
+                accesoIntent.putExtra("tipoAcceso", "222");
                 startActivity(accesoIntent);
             }
 
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
             public void onClick(View v){
                 // Estoy en MainActivity.this y voy hacia MainActivity.class
-                Intent controlIntent = new Intent (MainActivity.this, MenuControlActivity.class);
+                Intent controlIntent = new Intent (MainActivity.this, AccesoActivity.class);
+                controlIntent.putExtra("tipoAcceso", "777");
                 startActivity(controlIntent);
             }
 

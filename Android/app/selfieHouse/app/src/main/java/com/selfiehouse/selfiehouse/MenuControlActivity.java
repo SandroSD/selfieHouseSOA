@@ -82,7 +82,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                Toast.makeText(MenuControlActivity.this, "*Shake Detectado*" , Toast.LENGTH_LONG).show();
+                Toast.makeText(MenuControlActivity.this, "*Shake Detectado*" , Toast.LENGTH_SHORT).show();
                 AccionService servicioAccion = retrofit.create(AccionService.class);
                 Call<Respuesta> serviciosCall = servicioAccion.enviarAccion(Constantes.BUZZER_DESACTIVADO,Constantes.DISPARADOR_MANUAL);
                 serviciosCall.enqueue(new Callback<Respuesta>() {

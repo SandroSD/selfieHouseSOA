@@ -1,4 +1,4 @@
-package formas;
+package com.selfiehouse.selfiehouse.Clases;
 
 public class Circulo {
 
@@ -11,7 +11,16 @@ public class Circulo {
 	}
 	
 	public boolean intersectaCon(Circulo circulo) {
+		System.out.println(this.toString());
+		System.out.println(circulo.toString());
 		return this.centro.distanciaCon(circulo.centro) <= this.radio + circulo.radio;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Circulo{" +
+				"centro=" + centro +
+				", radio=" + radio +
+				'}';
+	}
 }

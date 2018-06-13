@@ -17,7 +17,7 @@ public interface AccionAccesoService {
         // Estoy creando un metodo que formara la URL. El parametro sera pull_solicitudes
         // luego obtiene la respuesta como un JSON que lo metera un una lista de objetos AccesoSolicitud
 
-    Call<Respuesta> validarCodigo(@Query("codigo_acceso") int codigo, @Query("tipo_acceso") int tipo);
+    Call<String> validarCodigo(@Query("codigo_acceso") int codigo, @Query("tipo_acceso") int tipo);
 
 
 

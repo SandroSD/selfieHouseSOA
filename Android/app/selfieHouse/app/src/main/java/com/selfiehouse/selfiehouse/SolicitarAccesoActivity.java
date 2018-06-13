@@ -1,12 +1,17 @@
 package com.selfiehouse.selfiehouse;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -34,11 +39,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
+import com.selfiehouse.selfiehouse.Clases.Circulo;
 import com.selfiehouse.selfiehouse.Clases.Constantes;
+import com.selfiehouse.selfiehouse.Clases.Punto;
 import com.selfiehouse.selfiehouse.Clases.Ubicacion;
 import com.selfiehouse.selfiehouse.Servicios.AccesoSolicitudService;
 import com.selfiehouse.selfiehouse.Servicios.UbicacionService;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,13 +62,19 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class SolicitarAccesoActivity extends AppCompatActivity  {
-
+    private TextView tvLatitud, tvLongitud, tvAltura, tvPrecision;
+    private LocationManager locManager;
+    private Location loc;
+    private TextView coordenadasDelSE, coordenadasDeAndroid;
+    Punto puntoEmbebido, puntoAndroid ;
+    Circulo circuloEmbebido,circuloAndroid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_solicitar_acceso);
-        final EditText mEdit = (EditText) findViewById(R.id.textoVerificacionUbicacion);
+        coordenadasDelSE = (TextView) findViewById(R.id.textViewGPS);
+        coordenadasDeAndroid = (TextView) findViewById(R.id.textViewUbicacionActual);
         /**
          * Obtengo la ubicacion del sistema embebido
          *
@@ -77,41 +91,57 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
             public void onResponse(Call<Ubicacion> call, Response<Ubicacion> response) {
 
                 double  longitudSE = response.body().getLongitud();
+                //coordenadasDelSE.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
 
+                puntoEmbebido = new Punto (response.body().getLatitud(),response.body().getLongitud());
+                circuloEmbebido = new Circulo(puntoEmbebido,0.1);
+                System.out.println(circuloEmbebido.toString());
+                if(obtenerCoordenadasAndroid()){
+                    if(circuloAndroid.intersectaCon(circuloEmbebido)){
+                        Toast.makeText(SolicitarAccesoActivity.this,"Intersectan",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SolicitarAccesoActivity.this, "No Intersectan", Toast.LENGTH_SHORT).show();
 
-                mEdit.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
-
-                /**
-                 *
-                 * Aca deberia compararla contra la del GPS
-                 */
-                /*
-                * si sale por verdadero
-                * */
-                //Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
-                //Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                //startActivity(intent);
-
-                /*
-                * si sale por falso
-                * */
-                //mEdit.setText("Debe estar cerca de la casa para poder solicitar acceso");
-
+                        //coordenadasDeAndroid.setText(p1.toString());
+                        System.out.println(circuloAndroid.toString());
+                    }
+                }
             }
 
             @Override
             public void onFailure(Call<Ubicacion> call, Throwable throwable) {
-                mEdit.setText("Hubo un error al obtener la ubicacion GPS");
+                coordenadasDelSE.setText("Hubo un error al obtener la ubicacion GPS");
+                return;
             }
         });
+
 
         /*
         Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
-       */
+        */
     }
 
+    private boolean obtenerCoordenadasAndroid(){
+        ActivityCompat.requestPermissions(SolicitarAccesoActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            tvLatitud.setText("No se han definido los permisos necesarios.");
+            tvLongitud.setText("");
+
+            return false;
+        }else
+        {
+            locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            loc = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            // System.out.println(loc.getLongitude());
+            // System.out.println(loc.getLatitude());
+            puntoAndroid = new Punto (loc.getLatitude(),loc.getLongitude());
+            circuloAndroid = new Circulo(puntoAndroid,0.1);
+            return true;
+        }
+    }
 
 
 

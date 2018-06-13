@@ -1,5 +1,7 @@
 package com.selfiehouse.selfiehouse.Clases;
 
+import java.util.Objects;
+
 public class Respuesta {
     private String respuesta;
 
@@ -14,4 +16,6 @@ public class Respuesta {
     public void setRespuesta(String respuesta) {
         this.respuesta = respuesta;
     }
+
+
 }

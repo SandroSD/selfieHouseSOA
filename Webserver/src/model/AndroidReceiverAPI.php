@@ -66,26 +66,36 @@ class AndroidReceiverAPI{
 						
 					if(Conexion::verificarCodigoAcceso($nro,$tipoAcceso)){
 						
-						# Envia el comando a Arduino para destrabar la puerta (esto hace titilar el led verde).
-						$html = file_get_contents("http://".IP_ARDUINO."/unlock");
-						$rta = json_decode($html);
+						if($tipoAcceso == ACCESO_ADMIN){
+							echo "Autorizado";
+							
+						} else {
+							# Envia el comando a Arduino para destrabar la puerta (esto hace titilar el led verde).
+							$html = file_get_contents("http://".IP_ARDUINO."/unlock");
+							$rta = json_decode($html);
+							if($rta->{'respuesta'} == "OK"){
 						
-						if($rta->{'respuesta'} == "OK"){
-						
-						# Cambia el estado de la traba en la base de datos
-							if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
-									$disparador = DISPARADOR_MANUAL;
-									$comentario = "Se destrabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
-									echo "Autorizado";
-									
-							} else {
-								# Logueo el error y mando notificacion
-								$comentarioError = "Hubo un error al destrabar la puerta";
-								Conexion::nuevaNotificacion($comentarioError);
-								Conexion::agregarAlLog(2,$comentarioError);
-								echo "Error";
+							# Cambia el estado de la traba en la base de datos
+								if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
+										$disparador = DISPARADOR_MANUAL;
+										$comentario = "Se destrabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
+										echo "Autorizado";
+										
+								} else {
+									# Logueo el error y mando notificacion
+									$comentarioError = "Hubo un error al destrabar la puerta";
+									Conexion::nuevaNotificacion($comentarioError);
+									Conexion::agregarAlLog(2,$comentarioError);
+									echo "Error";
+								}
 							}
 						}
+						
+						
+						
+						
+						
+						
 					} 
 					
 					
