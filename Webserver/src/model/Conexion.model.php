@@ -46,7 +46,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            //LogController::error("Conexion::cambiarEstado() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::cambiarEstado() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -63,7 +63,7 @@ class Conexion {
                 return true;
             }
         } else {
-            //LogController::error("Conexion::verificarCodigoExistente() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::verificarCodigoExistente() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
         }
         $stmt = null;
         return false;
@@ -78,7 +78,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            //LogController::error("Conexion::insertarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::insertarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -101,13 +101,13 @@ class Conexion {
 					$stmt = null;
 					return true;
 				} else {
-					//LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+					Conexion::agregarAlLog(2,"Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
 					$stmt = null;
 					return false;
 				}
 				
 			} else {
-				//LogController::error("Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+				Conexion::agregarAlLog(2,"Conexion::reiniciarEstados() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
 				$stmt = null;
 				return false;
 			}
@@ -129,7 +129,7 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            //LogController::error("Conexion::cambiarPosicionGeografica() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::cambiarPosicionGeografica() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -146,13 +146,58 @@ class Conexion {
             $stmt = null;
             return true;
         } else {
-            //LogController::error("Conexion::nuevaNotificacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::nuevaNotificacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
-        
     }
     
+	public function agregarAlLog($tipo,$detalle)
+    {
+        $stmt = Conexion::conectar()->prepare("insert into log(tipo,detalle) VALUES (:tipo,:detalle);");
+        $stmt->bindParam(":tipo", $tipo, PDO::PARAM_INT);
+		$stmt->bindParam(":detalle", $detalle, PDO::PARAM_STR);
+        
+        if($stmt->execute()){
+            $stmt = null;
+            return true;
+        } else {
+            $stmt = null;
+            return false;
+        }
+    }
+	
+	public function getCantidadesPendientes(){
+		$stmt = Conexion::conectar()->prepare("SELECT 'Notificaciones' as tabla, count(*) as cantidad 
+												FROM notificacion 
+												WHERE pendiente = 1
+												union all
+												SELECT 'Solicitudes' as tabla, count(*) as cantidad 
+												FROM acceso_solicitud 
+												WHERE estado = 1;");
+		
+		if($stmt->execute()){
+		    $datos = $stmt->fetchAll();
+		    $array = Array();
+		    $i=0;
+		    foreach($datos as $dato){
+		        $array[$i] = Array();
+		        $array[$i]['tabla'] = $dato['tabla'];
+		        $array[$i]['cantidad'] = $dato['cantidad'];
+		        $i++;
+		    }
+		    
+			$stmt = null;
+			return $array;
+			
+        } else {
+            Conexion::agregarAlLog(2,"Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
+            $stmt = null;
+            return false;
+        }
+		
+	}
+	
 	public function getNotificacionesPendientes(){
 		$stmt = Conexion::conectar()->prepare("SELECT * FROM notificacion WHERE pendiente = 1;");
 		
@@ -174,7 +219,7 @@ class Conexion {
 			return $array;
 			
         } else {
-            //LogController::error("Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::getNotificacionesPendientes() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -202,7 +247,7 @@ class Conexion {
             return $array;
 			
         } else {
-            //LogController::error("Conexion::getEstadosComponentes() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::getEstadosComponentes() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -230,7 +275,7 @@ class Conexion {
 		    return $array;
 			
         } else {
-            //LogController::error("Conexion::getSolicitudesDeAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::getSolicitudesDeAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -250,7 +295,7 @@ class Conexion {
             return $array;
 			
         } else {
-            //LogController::error("Conexion::getUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::getUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -266,7 +311,7 @@ class Conexion {
             return true;
 			
         } else {
-            //LogController::error("Conexion::setUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::setUbicacion() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -282,12 +327,15 @@ class Conexion {
             $datos = $stmt->fetch();
 			if(!$datos){
 				# El codigo ingresado no existe en la BD
-				//LogController::error("Conexion::verificarCodigoAcceso() - No hay datos",LOG_DB);
+				
+				Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - No hay datos");
 				$stmt = null;
 				return false;
 			} else {
-				if($datos["ESTADO"] == ACTIVADO){
+				if($datos["estado"] == ACTIVADO){
+					
 					if($tipoDeAccesoAVerificar == ACCESO_ADMIN){
+						
 						# Verifique TODO OK. El acceso es de Admin, el codigo sigue teniendo vigencia, por ende no le cambio el estado
 						//LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
 						$stmt = null;
@@ -299,25 +347,25 @@ class Conexion {
 						$stmt->bindParam(":nro", $nro, PDO::PARAM_INT);
 						if($stmt->execute()){
 							# Verifique TODO OK. El acceso es Simple, el codigo ya no tiene vigencia, por ende le cambio el estado, pero falla la query
-							//LogController::info("Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro,LOG_DB);
+							Conexion::agregarAlLog(1,"Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro);
 							$stmt = null;
 							return true;
 						} else {
-							//LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+							Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
 							$stmt = null;
 							return false;
 						}
 					}
 				} else {
 					# El codigo existe, pero ya fue utilizado
-					//LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+					Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
 					$stmt = null;
 					return false;
 				}
 			}
 			
         } else {
-            //LogController::error("Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo(),LOG_DB);
+            Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
             $stmt = null;
             return false;
         }
@@ -327,13 +375,13 @@ class Conexion {
     public function disparadorLabel($disparador)
     {
         if ($disparador == DISPARADOR_MOVIMIENTO){
-            return "Detecci�n de movimiento";
+            return "Deteccion de movimiento";
         } else if ($disparador == DISPARADOR_LLAMA){
-            return "Detecci�nn de llama";
+            return "Deteccion de llama";
         } else if ($disparador == DISPARADOR_TEMPERATURA){
             return "Temperatura fuera de rango";
         } else if ($disparador == DISPARADOR_MANUAL){
-            return "Acci�n Manual";
+            return "Accion Manual";
         }  else{
             return "Desconocido";
         }

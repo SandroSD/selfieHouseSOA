@@ -29,8 +29,8 @@ define('CANT_INTENTOS_LOGUEO',3);
 # Configuracion de la base de datos MySQL
 define("DIRECCION_ARDUINO","localhost");
 define("SERVER","localhost");
-define("USER","root");
-define("PASS","s4ndr0i99i");
+define("USER","selfiehouse");
+define("PASS","selfiehousepass");
 define("DB","db_selfiehouse");
 
 /***************************************
@@ -57,6 +57,8 @@ define("ID_BUZZER",2);
 define("ID_VENTILADOR",3);
 define("ID_LED_ROJO",4);
 define("ID_LED_VERDE",5);
+define("ID_SELFIEHOUSE",6);
+define("ID_DEBUG",7);
 
 
 /***************************************

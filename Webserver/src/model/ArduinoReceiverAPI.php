@@ -36,14 +36,14 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                //LogController::info($comentario,"LOG_SERVER");
-								echo "OK";
+								Conexion::agregarAlLog(1,$comentario);
+                                echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al activar la alarma buzzer";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                //LogController::error($comentarioError,"LOG_SERVER");
+                                Conexion::agregarAlLog(2,$comentarioError);
 								echo "Error";
                             }
                             
@@ -56,14 +56,14 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                //LogController::info($comentario,"LOG_SERVER");
+                                Conexion::agregarAlLog(1,$comentario);
 								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al desactivar la alarma buzzer";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                //LogController::error($comentarioError,"LOG_SERVER");
+                                Conexion::agregarAlLog(2,$comentarioError);
 								echo "Error";
                             }
                             
@@ -76,14 +76,14 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                //LogController::info($comentario,"LOG_SERVER");
+                                Conexion::agregarAlLog(1,$comentario);
 								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al activar el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                //LogController::error($comentarioError,"LOG_SERVER");
+                                Conexion::agregarAlLog(2,$comentarioError);
 								echo "Error";
                             }
                             
@@ -96,14 +96,14 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                //LogController::info($comentario,"LOG_SERVER");
+                                Conexion::agregarAlLog(1,$comentario);
 								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al desactivar el ventilador";
                                 Conexion::nuevaNotificacion($comentarioError);
-                                //LogController::error($comentarioError,"LOG_SERVER");
+                                Conexion::agregarAlLog(2,$comentarioError);
 								echo "Error";
                             }
                             
@@ -116,15 +116,15 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                                //LogController::info($comentario,"LOG_SERVER");
+                                Conexion::agregarAlLog(1,$comentario);
 								echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al trabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
-                               // LogController::error($comentarioError,"LOG_SERVER");
-							   echo "Error";
+								Conexion::agregarAlLog(2,$comentarioError);
+								echo "Error";
                             }
                             
                             break;
@@ -136,14 +136,14 @@ class ArduinoReceiverAPI{
                                 
                                 // Enviar notificacion
                                 Conexion::nuevaNotificacion($comentario);
-                               // LogController::info($comentario,"LOG_SERVER");
+								Conexion::agregarAlLog(1,$comentario);
 							   echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
                                 $comentarioError = "Hubo un error al destrabar la puerta";
                                 Conexion::nuevaNotificacion($comentarioError);
-                               // LogController::error($comentarioError,"LOG_SERVER");
+								Conexion::agregarAlLog(2,$comentarioError);
 							   echo "Error";
                             }
                             
@@ -156,16 +156,17 @@ class ArduinoReceiverAPI{
                                 $comentario = "Se acaba de iniciar el dispositivo. Se sincronizan los estados de componentes.";
                                 
                                 // Enviar notificacion
-                                //Conexion::nuevaNotificacion($comentario);
-                               // LogController::info($comentario,"LOG_SERVER");
+                                Conexion::nuevaNotificacion($comentario);
+								Conexion::agregarAlLog(1,$comentario);
 							   echo "OK";
                                 
                             } else {
                                 // Logueo el error y mando notificacion
-                                //$comentarioError = "Hubo un error al actualizar estados de los componentes";
-                                //Conexion::nuevaNotificacion($comentarioError);
+                                $comentarioError = "Hubo un error al actualizar estados de los componentes";
+                                Conexion::nuevaNotificacion($comentarioError);
+								Conexion::agregarAlLog(2,$comentarioError);
 								echo "Error";
-                               // LogController::error($comentarioError,"LOG_SERVER");
+                              
                             }
                             
                             break;
