@@ -3,7 +3,7 @@ package com.selfiehouse.selfiehouse.Clases;
 public interface Constantes {
 
     /* Datos de red */
-    public static final String IP_APACHE = "192.168.1.10";
+    public static final String IP_APACHE = "192.168.3.189";
     public static final String PUERTO_APACHE = "8080";
 
     /* Actuadores */

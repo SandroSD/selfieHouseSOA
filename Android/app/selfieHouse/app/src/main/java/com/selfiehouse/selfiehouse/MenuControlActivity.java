@@ -10,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
 import com.selfiehouse.selfiehouse.Clases.EstadoComponente;
 import com.selfiehouse.selfiehouse.Clases.Respuesta;
+import com.selfiehouse.selfiehouse.Clases.ShakeListener;
 import com.selfiehouse.selfiehouse.Servicios.AccesoSolicitudService;
 import com.selfiehouse.selfiehouse.Clases.Constantes;
 import com.selfiehouse.selfiehouse.Servicios.AccionService;
@@ -39,6 +41,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
     private TextView mTextMessage;
     private MenuItem cantidadDeSolicitudes;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
+    ShakeListener mShaker;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -72,6 +75,35 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
+        /* Deteccion de Shake*/
+
+        mShaker = new ShakeListener(this);
+        mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
+            public void onShake()
+            {
+                Toast.makeText(MenuControlActivity.this, "*Shake Detectado*" , Toast.LENGTH_LONG).show();
+                AccionService servicioAccion = retrofit.create(AccionService.class);
+                Call<Respuesta> serviciosCall = servicioAccion.enviarAccion(Constantes.BUZZER_DESACTIVADO,Constantes.DISPARADOR_MANUAL);
+                serviciosCall.enqueue(new Callback<Respuesta>() {
+                    @Override
+                    public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                        if(response.body().getRespuesta().equals("OK")){
+                            Toast.makeText(MenuControlActivity.this,"Buzzer: DESACTIVADO", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                        //switchBuzzer.setChecked(false);
+                        Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+        });
 
 
         /* Cambio los titulos para que no sean editables*/
@@ -411,21 +443,27 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
 
-                final EditText et = new EditText(MenuControlActivity.this);
-
+                final TextView popupSolcitudes = new TextView(MenuControlActivity.this);
+                popupSolcitudes.setText("\nUsted tiene "+as.size()+" solicitud/es pendiente/s");
+                popupSolcitudes.setTextSize(18);
+                popupSolcitudes.isTextAlignmentResolved();
                 // set prompts.xml to alertdialog builder
-                alertDialogBuilder.setView(et);
+                alertDialogBuilder.setView(popupSolcitudes);
 
                 // set dialog message
                 alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
-
+                alertDialogBuilder.setCancelable(false).setNegativeButton("Ver después", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
                 // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 // show it
                 alertDialog.show();
+
                 System.out.println("Solicitudes ( "+as.size()+")");
               //  cantidadDeSolicitudes.setTitle("Solicitudes ( "+as.size()+")");
                 //cantidadDeSolicitudes.setText("Solicitudes ( "+as.size()+")");
@@ -436,5 +474,19 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 System.out.println("Error: "+throwable.getMessage());
             }
         });
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mShaker.resume();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mShaker.pause();
+
     }
 }
