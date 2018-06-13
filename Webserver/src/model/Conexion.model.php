@@ -265,7 +265,7 @@ class Conexion {
 		        $array[$i] = Array();
 		        $array[$i]['id'] = $dato['id'];
 		        $array[$i]['fecha'] = $dato['fecha'];
-		        $array[$i]['foto'] = $dato['foto'];
+		        //$array[$i]['foto'] = $dato['foto'];
 		        $array[$i]['estado'] = $dato['estado'];
 		        
 		        $i++;
