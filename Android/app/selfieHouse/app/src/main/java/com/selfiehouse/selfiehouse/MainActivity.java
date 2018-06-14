@@ -6,10 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+
 import static android.view.View.*;
 
 public class MainActivity extends AppCompatActivity {
-    Button button_Cfg,button_Acc, button_SAcc, button_Ctrl;
+    ImageButton button_Cfg,button_Acc, button_SAcc, button_Ctrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);      // No permite que la activity se adapte a la rotacion de pantalla
@@ -19,10 +21,10 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);    // Oculta el nombre de la APP
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);        // Cambia el icono de la APP
 
-        button_Acc = (Button)findViewById(R.id.btnAcceder);
-        button_SAcc = (Button)findViewById(R.id.btnSolicitarAcceso);
-        button_Ctrl = (Button)findViewById(R.id.btnControlar);
-        button_Cfg = (Button)findViewById(R.id.btnConfiguracion);
+        button_Acc = (ImageButton)findViewById(R.id.btnAcceder);
+        button_SAcc = (ImageButton)findViewById(R.id.btnSolicitarAcceso);
+        button_Ctrl = (ImageButton)findViewById(R.id.btnControlar);
+        button_Cfg = (ImageButton)findViewById(R.id.btnConfiguracion);
 
         /* Click listener del boton Acceso */
 
