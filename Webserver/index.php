@@ -7,8 +7,8 @@
     <title>selfieHouse</title>
     <link rel="icon" type="image/svg" href="src/assets/plugins/camera.svg"> 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <!--script src="Webserver/src/assets/js/jquery.min.js"></script-->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>-->
+    <script src="src/assets/js/jquery.min.js"></script>
     
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">

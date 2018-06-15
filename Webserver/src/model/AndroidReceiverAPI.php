@@ -7,6 +7,7 @@ class AndroidReceiverAPI{
         
         switch ($metodo) {
             case 'GET':
+				
 				if (isset($_GET['pull_solicitudes'])){
 					
 					$solicitudes = Conexion::getSolicitudesDeAcceso();
@@ -58,13 +59,16 @@ class AndroidReceiverAPI{
 						echo "No hay notificaciones";
 					}
 				} else if (isset($_GET['codigo_acceso']) && isset($_GET['tipo_acceso'])){
+					
+					
 					$nro = $_GET['codigo_acceso'];
 					$tipoAcceso = $_GET['tipo_acceso'];
-					Conexion::agregarAlLog(1,"AndroidReceiverAPI:: Solicitud recibida: GET -  desde la IP: ".$_SERVER['REMOTE_ADDR']);
+					Conexion::agregarAlLog(1,"AndroidReceiverAPI:: Solicitud recibida: GET - Codigo: ".$nro." - Tipo Acceso: ".$tipoAcceso." -  desde la IP: ".$_SERVER['REMOTE_ADDR']);
 					
 					# Verifica que el codigo recibido tenga el tipo de acceso solicitado
 						
 					if(Conexion::verificarCodigoAcceso($nro,$tipoAcceso)){
+						
 						
 						if($tipoAcceso == ACCESO_ADMIN){
 							echo "Autorizado";
@@ -79,7 +83,7 @@ class AndroidReceiverAPI{
 								if(Conexion::cambiarEstado(ID_TRABA,DESACTIVADO)){
 										$disparador = DISPARADOR_MANUAL;
 										$comentario = "Se destrabo la puerta. Disparador: ".Conexion::disparadorLabel($disparador);
-										echo "Autorizado";
+										echo "{Autorizado}";
 										
 								} else {
 									# Logueo el error y mando notificacion
@@ -90,10 +94,6 @@ class AndroidReceiverAPI{
 								}
 							}
 						}
-						
-						
-						
-						
 						
 						
 					} 
@@ -120,6 +120,7 @@ class AndroidReceiverAPI{
 									$comentario = "Se activo la alarma selfieHouse. Disparador: ".Conexion::disparadorLabel($disparador);
 									
 									Conexion::agregarAlLog(1,$comentario);
+									
 									echo "OK";
 									
 								} else {

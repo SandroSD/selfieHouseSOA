@@ -105,11 +105,11 @@ WiFiClient client;              // Cliente que avisa al servidor Apache
 
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "red";
-const char* password = "****";
+const char* ssid = "WF_selfieHouse";
+const char* password = "selfiehouse";
 const char * ipServidorApache = "192.168.1.10";              // Servidor Apache - Hay que disponer de una IP fija
 const uint16_t puertoIpServidorApache = 8080;                  // Puerto Servidor Apache
-
+int wfConnectTry=0;
 /***************************************************************************
              FUNCIONES DE EJECUCION
 ***************************************************************************/
@@ -174,7 +174,7 @@ void setup()
         parpadearLed(pinLEDVerde);
         Serial.println("OK!");
         Serial.println("Reiniciando estados en la base de datos");
-    enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_MANUAL);
+        enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_MANUAL);
         
         Serial.println("Atendiendo peticiones y censado sensores...");
         digitalWrite(pinLEDVerde, HIGH);
@@ -229,6 +229,21 @@ void loop() {
   //estadoSelfieHouse == ACTIVADO ? medirSensores() : false;
   /* Si el estado de la casa está activado, evaluare las mediciones tomadas */
   estadoSelfieHouse == ACTIVADO ? evaluarMediciones() : false;
+
+  /*if (wfConnectTry >= 50000)
+  {
+      //Serial.println(WL_CONNECTED);
+      
+      wfConnectTry = 0;
+      Serial.println("Reconexion");
+      conectarAWIFI();
+      Serial.println(WiFi.localIP());
+     
+  }
+  
+  wfConnectTry++;
+  */
+ // Serial.println(wfConnectTry);
 
      
 }
@@ -489,13 +504,14 @@ void enviarAlServidorWS(int accion, int disparador)
 
 void enviarRespuesta(String respuesta)
 {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
-  json["respuesta"] = respuesta; 
+  //StaticJsonBuffer<200> jsonBuffer;
+ // JsonObject& json = jsonBuffer.createObject();
+ // json["respuesta"] = respuesta; 
   
-  String jsonChar;
-  json.prettyPrintTo(jsonChar);
-  server.send(200, "application/json", jsonChar); 
+ // String jsonChar;
+ // json.prettyPrintTo(jsonChar);
+  server.send(200, "text/plain", respuesta);
+ // server.send(200, "application/json", jsonChar); 
 }
 
 bool iniciarSensores()
@@ -893,12 +909,12 @@ void infoActuadores()
 
   JsonObject& s4 = jsonBuffer.createObject();
   s4["id"] = ID_LED_ROJO;
-  s4["nombre"] = "Ventilador";
+  s4["nombre"] = "LED Rojo";
   digitalRead(pinLEDRojo) == HIGH ? s4["valor"] = "Encendido" : s4["valor"] = "Apagado"; 
 
   JsonObject& s5 = jsonBuffer.createObject();
   s5["id"] = ID_LED_VERDE;
-  s5["nombre"] = "Ventilador";
+  s5["nombre"] = "LED Verde";
   digitalRead(pinLEDVerde) == HIGH ? s5["valor"] = "Encendido" : s5["valor"] = "Apagado"; 
 
   JsonArray& datosS = json.createNestedArray("actuadores");

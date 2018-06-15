@@ -94,7 +94,7 @@ class Conexion {
 			$stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
 			
 			if($stmt->execute()){
-				$stmt = Conexion::conectar()->prepare("update estado_componente set estado=1, fecha=:fecha where id in (1,5);");
+				$stmt = Conexion::conectar()->prepare("update estado_componente set estado=1, fecha=:fecha where id in (1,5,7);");
 				$stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
 				
 				if($stmt->execute()){
