@@ -13,12 +13,20 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="154dp">
 
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="269dp"
+            app:srcCompat="@drawable/key" />
+
         <EditText
             android:id="@+id/editTextCodigoAcceso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="number|numberPassword" />
+            android:inputType="number|numberPassword"
+            android:textAlignment="center"
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/buttonAcceso"

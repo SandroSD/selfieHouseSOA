@@ -1,14 +1,32 @@
 package com.selfiehouse.selfiehouse.Clases;
 
 public class RespuestaActuadores {
-    private String puerta, buzzer, ventilador, ledrojo, ledverde;
+    private String selfiehouse, debug, puerta, buzzer, ventilador, ledrojo, ledverde;
 
-    public RespuestaActuadores(String puerta, String buzzer, String ventilador, String ledrojo, String ledverde) {
+    public RespuestaActuadores(String selfiehouse, String debug, String puerta, String buzzer, String ventilador, String ledrojo, String ledverde) {
+        this.selfiehouse = selfiehouse;
+        this.debug = debug;
         this.puerta = puerta;
         this.buzzer = buzzer;
         this.ventilador = ventilador;
         this.ledrojo = ledrojo;
         this.ledverde = ledverde;
+    }
+
+    public String getSelfiehouse() {
+        return selfiehouse;
+    }
+
+    public void setSelfiehouse(String selfiehouse) {
+        this.selfiehouse = selfiehouse;
+    }
+
+    public String getDebug() {
+        return debug;
+    }
+
+    public void setDebug(String debug) {
+        this.debug = debug;
     }
 
     public String getPuerta() {

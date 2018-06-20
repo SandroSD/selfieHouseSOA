@@ -72,13 +72,13 @@ int estadoSelfieHouse;
 int modoEjecucion;
 
 /* Pines digitales */
-int pinSensorTempyHum = 4;               // GPIO04 - D2
+int pinSensorTempyHum = 4;          // GPIO04 - D2
 int pinSensorMovimiento = 14;       // GPIO14 - D5
 int pinVentilador = 15;             // GPIO15 - D8
-int pinServo = 10;                // GPIO10 - SD03
+int pinServo = 10;                  // GPIO10 - SD03
 int pinBuzzer = 3;                  // GPIO03 - RX
 int pinLEDVerde = 5;                // GPIO05 - D1
-int pinLEDRojo = 16;                  // GPIO16 - D0
+int pinLEDRojo = 16;                // GPIO16 - D0
 int pinSensorFlama = 12;            // GPIO12 - D6
 
 /* Pines analogicos */
@@ -869,11 +869,14 @@ void infoActuadores()
 
   JsonObject& json = jsonBuffer.createObject();
   
+  estadoSelfieHouse == ACTIVADO ? json["selfiehouse"] = "Activado" : json["selfiehouse"] = "Desactivado";
+  modoEjecucion == MODO_DEBUG ? json["debug"] = "Activado" : json["debug"] = "Desactivado";
   estadoTraba == ACTIVADO ? json["puerta"] = "Trabada" : json["puerta"] = "Destrabada";
   estadoBuzzer == ACTIVADO ? json["buzzer"] = "Encendido" : json["buzzer"] = "Apagado";
   estadoVentilador == ACTIVADO ? json["ventilador"] = "Encendido" : json["ventilador"] = "Apagado";
   digitalRead(pinLEDRojo) == HIGH ? json["ledrojo"] = "Encendido" : json["ledrojo"] = "Apagado"; 
   digitalRead(pinLEDVerde) == HIGH ? json["ledverde"] = "Encendido" : json["ledverde"] = "Apagado"; 
+ 
 
   json.prettyPrintTo(Serial);
   String jsonChar;

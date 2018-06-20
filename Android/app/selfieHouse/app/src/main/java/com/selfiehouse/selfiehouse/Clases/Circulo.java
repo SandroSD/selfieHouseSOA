@@ -11,8 +11,8 @@ public class Circulo {
 	}
 	
 	public boolean intersectaCon(Circulo circulo) {
-		System.out.println(this.toString());
-		System.out.println(circulo.toString());
+		//System.out.println(this.toString());
+		//System.out.println(circulo.toString());
 		return this.centro.distanciaCon(circulo.centro) <= this.radio + circulo.radio;
 	}
 

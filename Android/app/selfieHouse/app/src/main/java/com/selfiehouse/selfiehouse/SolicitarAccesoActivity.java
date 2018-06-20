@@ -7,6 +7,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -35,9 +36,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
 import com.selfiehouse.selfiehouse.Clases.Circulo;
 import com.selfiehouse.selfiehouse.Clases.Constantes;
@@ -74,7 +78,16 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_solicitar_acceso);
         coordenadasDelSE = (TextView) findViewById(R.id.textViewGPS);
-        coordenadasDeAndroid = (TextView) findViewById(R.id.textViewUbicacionActual);
+        //coordenadasDeAndroid = (TextView) findViewById(R.id.textViewUbicacionActual);
+        getWindow().getDecorView().setBackgroundColor(Color.WHITE);
+
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewMundo);
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
+        Glide.with(this).load(R.drawable.world).into(imageViewTarget);
+
+
+
+
         /**
          * Obtengo la ubicacion del sistema embebido
          *
@@ -84,36 +97,45 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        UbicacionService servicioUbicacion = retrofit.create(UbicacionService.class);
-        Call<Ubicacion> ubicacionCall = servicioUbicacion.getUbicacion(true);
-        ubicacionCall. enqueue(new Callback<Ubicacion>() {
-            @Override
-            public void onResponse(Call<Ubicacion> call, Response<Ubicacion> response) {
+        if(obtenerCoordenadasAndroid()){
 
-                double  longitudSE = response.body().getLongitud();
-                //coordenadasDelSE.setText("Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
+            UbicacionService servicioUbicacion = retrofit.create(UbicacionService.class);
+            Call<Ubicacion> ubicacionCall = servicioUbicacion.getUbicacion(true);
+            ubicacionCall. enqueue(new Callback<Ubicacion>() {
+                @Override
+                public void onResponse(Call<Ubicacion> call, Response<Ubicacion> response) {
 
-                puntoEmbebido = new Punto (response.body().getLatitud(),response.body().getLongitud());
-                circuloEmbebido = new Circulo(puntoEmbebido,0.1);
-                System.out.println(circuloEmbebido.toString());
-                if(obtenerCoordenadasAndroid()){
+                    double  longitudSE = response.body().getLongitud();
+                    System.out.println("Sistema embebido: Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
+
+                    puntoEmbebido = new Punto (response.body().getLatitud(),response.body().getLongitud());
+                    circuloEmbebido = new Circulo(puntoEmbebido,1);
+                    System.out.println(circuloEmbebido.toString());
+
                     if(circuloAndroid.intersectaCon(circuloEmbebido)){
                         Toast.makeText(SolicitarAccesoActivity.this,"Intersectan",Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(SolicitarAccesoActivity.this, "No Intersectan", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(SolicitarAccesoActivity.this, "No Intersectan", Toast.LENGTH_SHORT).show();
 
                         //coordenadasDeAndroid.setText(p1.toString());
                         System.out.println(circuloAndroid.toString());
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<Ubicacion> call, Throwable throwable) {
-                coordenadasDelSE.setText("Hubo un error al obtener la ubicacion GPS");
-                return;
-            }
-        });
+                }
+
+                @Override
+                public void onFailure(Call<Ubicacion> call, Throwable throwable) {
+                    coordenadasDelSE.setText("Error al obtener las coordenadas del servidor");
+                    return;
+                }
+            });
+
+          } else {
+
+
+        }
+
+
 
 
         /*
@@ -127,19 +149,34 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
         ActivityCompat.requestPermissions(SolicitarAccesoActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            tvLatitud.setText("No se han definido los permisos necesarios.");
-            tvLongitud.setText("");
+            coordenadasDelSE.setText("No se han definido los permisos necesarios.");
+            //tvLatitud.setText("No se han definido los permisos necesarios.");
+            //tvLongitud.setText("");
 
             return false;
-        }else
+        }
+        else
         {
             locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             loc = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            // System.out.println(loc.getLongitude());
-            // System.out.println(loc.getLatitude());
-            puntoAndroid = new Punto (loc.getLatitude(),loc.getLongitude());
-            circuloAndroid = new Circulo(puntoAndroid,0.1);
-            return true;
+
+            if(loc == null)
+            {
+                coordenadasDelSE.setText("Error al obtener ubicacion de Android");
+                return false;
+
+            } else {
+                 System.out.println(loc.getLongitude());
+                 System.out.println(loc.getLatitude());
+
+                puntoAndroid = new Punto (loc.getLatitude(),loc.getLongitude());
+                circuloAndroid = new Circulo(puntoAndroid,0.1);
+                return true;
+
+            }
+
+
+
         }
     }
 
