@@ -113,9 +113,16 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
                     System.out.println(circuloEmbebido.toString());
 
                     if(circuloAndroid.intersectaCon(circuloEmbebido)){
-                        Toast.makeText(SolicitarAccesoActivity.this,"Intersectan",Toast.LENGTH_SHORT).show();
+                        coordenadasDelSE.setText("Ubicación válida");
+                        coordenadasDelSE.setTextColor(Color.GREEN);
+                        Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                        //Toast.makeText(SolicitarAccesoActivity.this,"Intersectan",Toast.LENGTH_SHORT).show();
                     } else {
-                       Toast.makeText(SolicitarAccesoActivity.this, "No Intersectan", Toast.LENGTH_SHORT).show();
+                        coordenadasDelSE.setText("Debe estar cerca de la casa para solicitar acceso");
+                        coordenadasDelSE.setTextColor(Color.RED);
+                        //Toast.makeText(SolicitarAccesoActivity.this, "No Intersectan", Toast.LENGTH_SHORT).show();
 
                         //coordenadasDeAndroid.setText(p1.toString());
                         System.out.println(circuloAndroid.toString());
@@ -126,6 +133,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
                 @Override
                 public void onFailure(Call<Ubicacion> call, Throwable throwable) {
                     coordenadasDelSE.setText("Error al obtener las coordenadas del servidor");
+                    coordenadasDelSE.setTextColor(Color.RED);
                     return;
                 }
             });
@@ -138,11 +146,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
 
 
 
-        /*
-        Uri uri = Uri.parse("http://192.168.1.10:8080/selfiehouse");
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
-        */
+
     }
 
     private boolean obtenerCoordenadasAndroid(){
@@ -151,6 +155,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             coordenadasDelSE.setText("No se han definido los permisos necesarios.");
+            coordenadasDelSE.setTextColor(Color.RED);
             //tvLatitud.setText("No se han definido los permisos necesarios.");
             //tvLongitud.setText("");
 
@@ -164,11 +169,13 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
             while(loc == null){
                 loc = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 System.out.println("Intentando obtener ubicacion GPS");
+                coordenadasDelSE.setTextColor(Color.BLUE);
             }
 
             if(loc == null)
             {
                 coordenadasDelSE.setText("Error al obtener ubicacion de Android");
+                coordenadasDelSE.setTextColor(Color.RED);
                 return false;
 
             } else {
