@@ -840,41 +840,19 @@ void infoSensores()
   DynamicJsonBuffer jsonBuffer(bufferSize);
 
   JsonObject& json = jsonBuffer.createObject();
-  JsonObject& s1 = jsonBuffer.createObject();
 
-  s1["nombre"] = "Temperatura";                 
-  s1["valor"] = medicionTemperatura;
-
-  JsonObject& s2 = jsonBuffer.createObject(); 
-
-  s2["nombre"] = "Movimiento";            
-  estadoMovimiento == ACTIVADO ? s2["valor"]= "Hay movimiento" : s2["valor"] = "No hay movimiento";
+  json["temperatura"] = medicionTemperatura;                 
+  estadoMovimiento == ACTIVADO ? json["movimiento"]= "Hay movimiento" : json["movimiento"]= "No hay movimiento";
   
-  JsonObject& s3 = jsonBuffer.createObject();
-  
-  s3["nombre"] = "Luz";
   if( medicionLuz > 10 && medicionLuz < 1000){
-    s3["valor"] = "Bajo";
+    json["luz"] = "Bajo";
   } else if (medicionLuz >= 1000 && medicionLuz < 2000){
-    s3["valor"] = "Medio";
+    json["luz"] = "Medio";
   } else {
-    s3["valor"] = "Alto";
+    json["luz"] = "Alto";
   }
- 
-  JsonObject& s4 = jsonBuffer.createObject();
-  s4["nombre"] = "Flama";
-  medicionFlama == HIGH ? s4["valor"] =  "Hay fuego" : s4["valor"] = "No hay fuego";
   
-
-  JsonObject& s5 = jsonBuffer.createObject();
-  s5["nombre"] = "Ventilador";
-  digitalRead(pinLEDVerde) == HIGH ? s5["valor"] = "Encendido" : s5["valor"] = "Apagado"; 
-
-  JsonArray& datosS = json.createNestedArray("sensores");
-  datosS.add(s1);
-  datosS.add(s2);
-  datosS.add(s3);
-  datosS.add(s4);
+  medicionFlama == HIGH ? json["flama"] =  "Hay fuego" : json["flama"] = "No hay fuego";
 
   json.prettyPrintTo(Serial);
   String jsonChar;
@@ -890,39 +868,12 @@ void infoActuadores()
   DynamicJsonBuffer jsonBuffer(bufferSize);
 
   JsonObject& json = jsonBuffer.createObject();
-  JsonObject& s1 = jsonBuffer.createObject();
-
-  s1["id"] = ID_TRABA;
-  s1["nombre"] = "Traba";                 
-  estadoTraba == ACTIVADO ? s1["valor"] = "Encendida" : s1["valor"] = "Apagada";
-
-  JsonObject& s2 = jsonBuffer.createObject(); 
-
-  s2["id"] = ID_BUZZER;
-  s2["nombre"] = "Buzzer";            
-  estadoBuzzer == ACTIVADO ? s2["valor"] = "Encendido" : s2["valor"] = "Apagado";
-
-  JsonObject& s3 = jsonBuffer.createObject();
-  s3["id"] = ID_VENTILADOR;
-  s3["nombre"] = "Ventilador";
-  estadoVentilador == ACTIVADO ? s3["valor"] = "Encendido" : s3["valor"] = "Apagado";
-
-  JsonObject& s4 = jsonBuffer.createObject();
-  s4["id"] = ID_LED_ROJO;
-  s4["nombre"] = "LED Rojo";
-  digitalRead(pinLEDRojo) == HIGH ? s4["valor"] = "Encendido" : s4["valor"] = "Apagado"; 
-
-  JsonObject& s5 = jsonBuffer.createObject();
-  s5["id"] = ID_LED_VERDE;
-  s5["nombre"] = "LED Verde";
-  digitalRead(pinLEDVerde) == HIGH ? s5["valor"] = "Encendido" : s5["valor"] = "Apagado"; 
-
-  JsonArray& datosS = json.createNestedArray("actuadores");
-  datosS.add(s1);
-  datosS.add(s2);
-  datosS.add(s3);
-  datosS.add(s4);
-  datosS.add(s5);
+  
+  estadoTraba == ACTIVADO ? json["puerta"] = "Trabada" : json["puerta"] = "Destrabada";
+  estadoBuzzer == ACTIVADO ? json["buzzer"] = "Encendido" : json["buzzer"] = "Apagado";
+  estadoVentilador == ACTIVADO ? json["ventilador"] = "Encendido" : json["ventilador"] = "Apagado";
+  digitalRead(pinLEDRojo) == HIGH ? json["ledrojo"] = "Encendido" : json["ledrojo"] = "Apagado"; 
+  digitalRead(pinLEDVerde) == HIGH ? json["ledverde"] = "Encendido" : json["ledverde"] = "Apagado"; 
 
   json.prettyPrintTo(Serial);
   String jsonChar;
