@@ -109,7 +109,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
                     System.out.println("Sistema embebido: Latitud: "+response.body().getLatitud()+" - Longitud: "+response.body().getLongitud());
 
                     puntoEmbebido = new Punto (response.body().getLatitud(),response.body().getLongitud());
-                    circuloEmbebido = new Circulo(puntoEmbebido,1);
+                    circuloEmbebido = new Circulo(puntoEmbebido,Constantes.RADIO_UBICACION);
                     System.out.println(circuloEmbebido.toString());
 
                     if(circuloAndroid.intersectaCon(circuloEmbebido)){
@@ -147,6 +147,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
 
     private boolean obtenerCoordenadasAndroid(){
         ActivityCompat.requestPermissions(SolicitarAccesoActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             coordenadasDelSE.setText("No se han definido los permisos necesarios.");
@@ -160,6 +161,11 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
             locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             loc = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+            while(loc == null){
+                loc = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                System.out.println("Intentando obtener ubicacion GPS");
+            }
+
             if(loc == null)
             {
                 coordenadasDelSE.setText("Error al obtener ubicacion de Android");
@@ -170,7 +176,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
                  System.out.println(loc.getLatitude());
 
                 puntoAndroid = new Punto (loc.getLatitude(),loc.getLongitude());
-                circuloAndroid = new Circulo(puntoAndroid,0.1);
+                circuloAndroid = new Circulo(puntoAndroid,Constantes.RADIO_UBICACION);
                 return true;
 
             }

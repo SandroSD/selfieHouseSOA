@@ -46,5 +46,5 @@ public interface Constantes {
     public static final int ACCESO_NORMAL = 222;
     public static final int ACCESO_CONTROL = 777;
 
-
+    public static final double RADIO_UBICACION = 0.01;
 }

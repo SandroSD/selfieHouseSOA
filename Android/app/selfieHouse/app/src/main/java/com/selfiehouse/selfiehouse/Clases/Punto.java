@@ -11,8 +11,7 @@ public class Punto {
 	}
 
 	public double distanciaCon(Punto punto) {
-	    return Math.sqrt( Math.pow(this.x - punto.x, 2)
-				+ Math.pow(this.y - punto.y, 2));
+	    return Math.sqrt( Math.pow(this.x - punto.x, 2)	+ Math.pow(this.y - punto.y, 2));
 	}
 
 	@Override
