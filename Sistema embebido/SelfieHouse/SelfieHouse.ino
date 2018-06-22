@@ -2,7 +2,7 @@
   |--------------------------------------------------------------------------
   | Proyecto      : selfieHouse
   | Version       : 1.0.1
-  | Actualizado   : 26/05/2018
+  | Actualizado   : 22/06/2018
   | Bibliotecas   : Servo, DHT, ESP8266WebServer, ESP8266WiFiMulti, ESP8266mDNS
   | Autores       : ~ Dezerio, Sandro (@SandroSD)
   |                 ~ Jalid, Fernando (@fernandodj)
@@ -39,7 +39,6 @@
 
 #define TOPE_FLAMA        1
 #define TOPE_TEMPERATURA    30
-//#define TOPE_HUMEDAD      85
 #define TOPE_LUZ        10
 
 #define PUERTA_TRABADA        1000
@@ -64,6 +63,7 @@
 #define ID_LED_ROJO      4
 #define ID_LED_VERDE    5
 
+#define TIEMPO_CENSADO 100
 
 
 
@@ -96,7 +96,8 @@ int medicionMovimiento;
 
 /* Flags y Semaforos*/
 int estadoBuzzer, estadoTraba, estadoVentilador, estadoWebserver, estadoFlama, estadoTyH, estadoMovimiento;
-
+unsigned long startMillis;  //some global variables available anywhere in the program
+unsigned long currentMillis;
 
 /* Conexion de red */
 ESP8266WebServer server(80);    // Webserver
@@ -105,11 +106,11 @@ WiFiClient client;              // Cliente que avisa al servidor Apache
 
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "WF_selfieHouse";
-const char* password = "selfiehouse";
+const char* ssid = "WF_selfieHouse";    //WF_selfieHouse
+const char* password = "selfiehouse"; //selfiehouse
 const char * ipServidorApache = "192.168.1.10";              // Servidor Apache - Hay que disponer de una IP fija
 const uint16_t puertoIpServidorApache = 8080;                  // Puerto Servidor Apache
-int wfConnectTry=0;
+
 /***************************************************************************
              FUNCIONES DE EJECUCION
 ***************************************************************************/
@@ -135,7 +136,7 @@ void setup()
   {
    Serial.print("Conectando a la red ");
    Serial.println(ssid);
-   if (conectarAWIFI())
+   if(conectarAWIFI())
     {
     Serial.println("OK!");
 
@@ -178,6 +179,7 @@ void setup()
         
         Serial.println("Atendiendo peticiones y censado sensores...");
         digitalWrite(pinLEDVerde, HIGH);
+    startMillis = millis();   //initial start time
       } else {
         digitalWrite(pinLEDRojo, HIGH);
         Serial.println("ERROR");
@@ -218,34 +220,30 @@ void setup()
 
 }
 
+void nada(){
+  
+}
+
 void loop() {
 
   /* Atencion de peticiones */
   server.handleClient();    
   
-  /* Obtengo datos de sensores */
-  medirSensores();          
-  
-  //estadoSelfieHouse == ACTIVADO ? medirSensores() : false;
-  /* Si el estado de la casa está activado, evaluare las mediciones tomadas */
-  estadoSelfieHouse == ACTIVADO ? evaluarMediciones() : false;
-
-  /*if (wfConnectTry >= 50000)
+  if(estadoSelfieHouse == ACTIVADO)
   {
-      //Serial.println(WL_CONNECTED);
-      
-      wfConnectTry = 0;
-      Serial.println("Reconexion");
-      conectarAWIFI();
-      Serial.println(WiFi.localIP());
-     
+    currentMillis = millis();   //get the current "time" (actually the number of milliseconds since the program started)
+    if (currentMillis - startMillis >= TIEMPO_CENSADO)//test whether the period has elapsed
+    {
+      Serial.println("Tomo mediciones");
+      medirSensores();  /* Si el estado de la casa está activado, obtengo datos de sensores */   
+      evaluarMediciones();
+      startMillis = currentMillis;  //IMPORTANT to save the start time of the current LED state.
+    }
   }
   
-  wfConnectTry++;
-  */
- // Serial.println(wfConnectTry);
-
-     
+   
+  /* Si el estado de la casa está activado, evaluare las mediciones tomadas */
+ 
 }
 
 
@@ -351,7 +349,7 @@ bool iniciarWebserver()
     /* Informacion de los sensores */
     server.on("/infoSensores", infoSensores);
 
-  /* Informacion de los estados de actuadores */
+	/* Informacion de los estados de actuadores */
     server.on("/infoActuadores", infoActuadores);
   
     /* Excepcion ante una peticion no reconocida*/
@@ -518,7 +516,6 @@ bool iniciarSensores()
 {
   /* Inicializo Buzzer */
   pinMode(pinBuzzer, OUTPUT);
-  //analogWrite(pinBuzzer, 150);
   estadoBuzzer = DESACTIVADO;
 
   /* Inicializo Sensor de Temperatura */
@@ -556,17 +553,22 @@ bool iniciarSensores()
 void medirSensores()
 {
   /* Por orden de importancia */
-
-  //Serial.println("Mido flama");
-  medicionFlama = medirFlama();
-  //Serial.println("Mido movimiento");
-  estadoMovimiento = medirMovimiento();
-  //Serial.println("Mido temp");
-  medicionTemperatura = medirTemperatura();
-  //medicionHumedad = medirHumedad();
-  //Serial.println("Mido luz");
-  medicionLuz = medirLuz();
   
+  // LUZ
+  double valor = analogRead(pinSensorLuz); 
+  medicionLuz = ((1023-valor) * 10 /valor);
+  
+  // FLAMA
+  medicionFlama = digitalRead(pinSensorFlama);
+  
+  // MOVIMIENTO
+  
+  digitalRead(pinSensorMovimiento) == HIGH ? estadoMovimiento = ACTIVADO : estadoMovimiento = DESACTIVADO;
+  
+  // TEMPERATURA
+  medicionTemperatura = sensorTempyHum.readTemperature();
+   
+   
   //Serial.print(mostrarMediciones());
 
 }
@@ -730,27 +732,11 @@ String mostrarMediciones()
   return contenido;
 }
 
-float medirTemperatura()
-{
-  return sensorTempyHum.readTemperature();
-}
-
 /*float medirHumedad()
 {
   return sensorTempyHum.readHumidity();
 }*/
 
-float medirFlama()
-{
-  return digitalRead(pinSensorFlama);
-  //return analogRead(pinSensorFlama) * (5.0 / 1023.0); 
-}
-
-float medirLuz()
-{
-  double valor = analogRead(pinSensorLuz); 
-  return ((1023-valor) * 10 /valor);
-}
 
 void activarVentilador()
 {
@@ -805,17 +791,6 @@ void parpadearLed(int pin)
 }
 
 
-/*
-   Función medirMovimiento()
-   Descripción: Detecta HIGH o LOW en el pin indicado y devuelve ACTIVADO en caso de detectar movimiento. Caso contrario devuelve DESACTIVADO
-   Última modificación: 28/4/2018 20:13 (@mauroat)
-   Testear!!!!!!
-
-*/
-int medirMovimiento()
-{
-  return digitalRead(pinSensorMovimiento) == HIGH ? ACTIVADO : DESACTIVADO;
-}
 
 void activarBuzzer()
 {
@@ -836,6 +811,7 @@ void desactivarBuzzer()
 ***************************************************************************/
 void infoSensores()
 {
+  medirSensores();
   const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(5) + 60;
   DynamicJsonBuffer jsonBuffer(bufferSize);
 
@@ -901,6 +877,5 @@ void notFound()
   server.send(404, "text/html", message);
   //parpadearLed(pinAuxiliar);
 }
-
 
 
