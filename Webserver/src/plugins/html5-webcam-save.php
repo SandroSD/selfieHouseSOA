@@ -12,7 +12,7 @@ $fp = fopen('../images/'.$datetime.'.jpg', 'w');
 if($fp){
     $conn = new mysqli(SERVER,USER,PASS,DB);
     if($conn){
-        $consulta = "INSERT INTO `acceso_solicitud` (`FECHA`, `FOTO`, `ESTADO`) VALUES ('".$datetime."',  'Webserver/src/images/".$datetime.".jpg', 1);";        
+		$consulta = "INSERT INTO `acceso_solicitud` (`FECHA`, `FOTO`, `ESTADO`) VALUES ('".$datetime."',  'src/images/".$datetime.".jpg', 1);";        
         
 		if($conn->query($consulta)){
             echo "OK";

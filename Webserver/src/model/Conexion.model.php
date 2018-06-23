@@ -199,7 +199,7 @@ class Conexion {
 	}
 	
 	public function getNotificacionesPendientes(){
-		$stmt = Conexion::conectar()->prepare("SELECT * FROM notificacion WHERE pendiente = 1;");
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM notificacion WHERE pendiente = 1 order by fecha desc;");
 		
 		if($stmt->execute()){
 		    $datos = $stmt->fetchAll();
