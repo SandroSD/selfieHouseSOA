@@ -317,10 +317,13 @@ class Conexion {
         }
 	}
 	
-    public function verificarCodigoAcceso($nro,$tipoDeAccesoAVerificar)    {
-        # Consulto la BD para ver si existe el nro/codigo de acceso
+    public function verificarCodigoAcceso($numero,$tipoDeAccesoAVerificar)    {
+        //$numero = $nro;
+		
+		
+		# Consulto la BD para ver si existe el nro/codigo de acceso
 		$stmt = Conexion::conectar()->prepare("SELECT * FROM acceso_codigo WHERE NRO = :nro AND PERMISO= :permiso;");
-        $stmt->bindParam(":nro", $nro, PDO::PARAM_INT);
+        $stmt->bindParam(":nro", $numero, PDO::PARAM_INT);
         $stmt->bindParam(":permiso", $tipoDeAccesoAVerificar, PDO::PARAM_INT);
         
         if($stmt->execute()){
@@ -342,12 +345,12 @@ class Conexion {
 						return true;
 					} else {
 						# Verifique TODO OK. El acceso es Simple, el codigo ya no tiene vigencia, por ende le cambio el estado
-						$stmt = Conexion::conectar()->prepare("UPDATE acceso_codigo SET ESTADO = :estado WHERE NRO = :nro;");
-						$stmt->bindParam(":estado", DESACTIVADO, PDO::PARAM_INT);
-						$stmt->bindParam(":nro", $nro, PDO::PARAM_INT);
+						$stmt = Conexion::conectar()->prepare("UPDATE acceso_codigo SET ESTADO = 0 WHERE NRO = :nro;");
+						$stmt->bindParam(":nro", $numero, PDO::PARAM_INT);
+						
 						if($stmt->execute()){
 							# Verifique TODO OK. El acceso es Simple, el codigo ya no tiene vigencia, por ende le cambio el estado, pero falla la query
-							Conexion::agregarAlLog(1,"Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$nro);
+							Conexion::agregarAlLog(1,"Conexion::verificarCodigoAcceso() - Acceso concedido al codigo: ".$numero);
 							$stmt = null;
 							return true;
 						} else {
@@ -358,7 +361,7 @@ class Conexion {
 					}
 				} else {
 					# El codigo existe, pero ya fue utilizado
-					Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
+					//Conexion::agregarAlLog(2,"Conexion::verificarCodigoAcceso() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
 					$stmt = null;
 					return false;
 				}

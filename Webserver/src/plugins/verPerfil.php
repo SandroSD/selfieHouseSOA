@@ -5,13 +5,11 @@ $conn = new mysqli(SERVER,USER,PASS,DB);
 
 $idPersona = $_GET['op'];
 
-$query = "SELECT * FROM acceso WHERE id=$idPersona";
+$query = "SELECT * FROM acceso_solicitud WHERE id=$idPersona";
 
-$resultado = $conn->query($query)->fetch_assoc();
-
-$valores = explode('/',$resultado['FOTO']);
-
-$ruta = "../".$valores[2]."/".$valores[3];
+$resultado = $conn->query($query)->fetch_assoc();   
+$ruta = "../../".$resultado['foto'];
+echo $ruta;
 
 ?>
 <!DOCTYPE html>

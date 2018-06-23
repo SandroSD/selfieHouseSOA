@@ -79,7 +79,9 @@ int pinServo = 10;                  // GPIO10 - SD03
 int pinBuzzer = 3;                  // GPIO03 - RX
 int pinLEDVerde = 5;                // GPIO05 - D1
 int pinLEDRojo = 16;                // GPIO16 - D0
+int pinLEDAzul = 2;                 // GPIO02 - D4
 int pinSensorFlama = 12;            // GPIO12 - D6
+
 
 /* Pines analogicos */
 int pinSensorLuz = A0;        // A0
@@ -123,7 +125,8 @@ void setup()
   /* Inicializo LEDs  */
   pinMode(pinLEDVerde, OUTPUT);
   pinMode(pinLEDRojo, OUTPUT);
-
+  pinMode(pinLEDAzul, OUTPUT);
+  
   Serial.begin(115200);
 
   Serial.println("**** selfieHouse ****");
@@ -392,12 +395,14 @@ bool iniciarCliente()
 void activarSelfieHouseWS(){
   Serial.println("Instruccion recibida: Estado selfieHouse ACTIVADO");
   estadoSelfieHouse = ACTIVADO;
+  digitalWrite(pinLEDAzul, HIGH);
   enviarRespuesta("OK");
 }
 
 void desactivarSelfieHouseWS(){
   Serial.println("Instruccion recibida: Estado selfieHouse DESACTIVADO");
   estadoSelfieHouse = DESACTIVADO;
+  digitalWrite(pinLEDAzul, LOW);
   enviarRespuesta("OK");
 }
 
@@ -632,10 +637,10 @@ bool evaluarMediciones ()
   if (medicionMovimiento == DESACTIVADO && estadoMovimiento == DESACTIVADO)
   {
     //Serial.println("No se detectó movimiento");
-    digitalWrite(pinLEDRojo, LOW);
+    //digitalWrite(pinLEDRojo, LOW);
   } else {
 
-    //Serial.println("Se detectó movimiento");
+    Serial.println("Se detectó movimiento");
     estadoBuzzer = ACTIVADO;
     activarBuzzer();
     digitalWrite(pinLEDRojo, HIGH);
@@ -665,7 +670,8 @@ bool evaluarMediciones ()
   if (medicionTemperatura <= TOPE_TEMPERATURA)
   { 
     //Serial.println("Temperatura en rango aceptable");
-  } else {
+  } 
+  else {
     if (estadoVentilador == DESACTIVADO) {
       modoEjecucion == MODO_DEBUG ? Serial.println("Temperatura excedida. Se enciende ventilador") : false;
       estadoVentilador = ACTIVADO;
