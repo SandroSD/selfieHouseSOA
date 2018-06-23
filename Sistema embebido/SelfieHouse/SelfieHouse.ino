@@ -63,7 +63,7 @@
 #define ID_LED_ROJO      4
 #define ID_LED_VERDE    5
 
-#define TIEMPO_CENSADO 100
+#define TIEMPO_CENSADO 150
 
 
 
@@ -135,92 +135,73 @@ void setup()
   delay(2000);
   
   /* En modo PRODUCCION inicializo todos los servicios */
-  if(modoEjecucion != 4)
-  {
    Serial.print("Conectando a la red ");
    Serial.println(ssid);
    if(conectarAWIFI())
     {
-    Serial.println("OK!");
-
-    ////////////////////////////////////////////////////////////////
-
-    Serial.print("Conectado a red: ");
-    Serial.println(ssid);
-    Serial.print("Direccion IP: ");
-    Serial.println(WiFi.localIP());
-    Serial.println("------------------");
-    delay(300);
-
-    ////////////////////////////////////////////////////////////////
-
-    Serial.print("Inicializando Sensores: ");
-    if (iniciarSensores()) {
-      parpadearLed(pinLEDVerde);
       Serial.println("OK!");
-    } else {
-      digitalWrite(pinLEDRojo, HIGH);
-      Serial.println("ERROR");
-      delay(60000000);
-    }
-    delay(300);
-
-    ////////////////////////////////////////////////////////////////
-
-    Serial.print("Inicializando Webserver: ");
-    if (iniciarWebserver()) {
-      parpadearLed(pinLEDVerde);
-      Serial.println("OK!");
-
-      // Lo comento hasta que pueda bajar el xampp
-      Serial.print("Inicializando Cliente Apache: ");
-      if (iniciarCliente()) {
+  
+      ////////////////////////////////////////////////////////////////
+  
+      Serial.print("Conectado a red: ");
+      Serial.println(ssid);
+      Serial.print("Direccion IP: ");
+      Serial.println(WiFi.localIP());
+      Serial.println("------------------");
+      delay(300);
+  
+      ////////////////////////////////////////////////////////////////
+        
+      Serial.print("Inicializando Sensores: ");
+      if (iniciarSensores()) {
         parpadearLed(pinLEDVerde);
         Serial.println("OK!");
-        Serial.println("Reiniciando estados en la base de datos");
-        enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_MANUAL);
-        
-        Serial.println("Atendiendo peticiones y censado sensores...");
-        digitalWrite(pinLEDVerde, HIGH);
-    startMillis = millis();   //initial start time
+        delay(300);
       } else {
+        digitalWrite(pinLEDVerde, LOW);
         digitalWrite(pinLEDRojo, HIGH);
         Serial.println("ERROR");
         delay(60000000);
-
       }
+      
 
-    } else {
+      ////////////////////////////////////////////////////////////////
+
+      Serial.print("Inicializando Webserver: ");
+      if (iniciarWebserver()) {
+        parpadearLed(pinLEDVerde);
+        Serial.println("OK!");
+  
+        // Lo comento hasta que pueda bajar el xampp
+        Serial.print("Inicializando Cliente Apache: ");
+        if (iniciarCliente()) {
+          parpadearLed(pinLEDVerde);
+          Serial.println("OK!");
+          Serial.println("Reiniciando estados en la base de datos");
+          enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_MANUAL);
+          
+          Serial.println("Atendiendo peticiones y censado sensores...");
+          digitalWrite(pinLEDVerde, HIGH);
+          startMillis = millis();   //initial start time
+        
+        } else {
+          digitalWrite(pinLEDRojo, HIGH);
+          Serial.println("ERROR");
+          delay(60000000);
+        }
+
+      } else {
+        digitalWrite(pinLEDVerde, LOW);
+        digitalWrite(pinLEDRojo, HIGH);
+        Serial.println("ERROR");
+        delay(60000000);
+      }
+    } else  {
+      digitalWrite(pinLEDVerde, LOW);
       digitalWrite(pinLEDRojo, HIGH);
       Serial.println("ERROR");
       delay(60000000);
-    }
-
-    }
-    else
-    {
-    digitalWrite(pinLEDRojo, HIGH);
-    Serial.println("ERROR");
-    delay(60000000);
     } 
-  } 
-  
-  else 
-  /* En modo DEBUG solo inicializo los sensores */
-  {  
-    if (iniciarSensores()) {
-      parpadearLed(pinLEDVerde);
-      Serial.println("OK!");
-    } else {
-      digitalWrite(pinLEDRojo, HIGH);
-      Serial.println("ERROR");
-      delay(60000000);
-    }
-    ////////////////////////////////////////////////////////////////    
-  }
-  
-  
-
 }
 
 void nada(){
@@ -583,7 +564,8 @@ bool evaluarMediciones ()
   /* Evaluo por orden de importancia */
 
   //Serial.print("\nNivel de luz: ");
-  if( medicionLuz > 10 && medicionLuz < 1000){
+  //Serial.println(medicionLuz);
+  if( medicionLuz > -3 && medicionLuz < 1000){
     //Serial.println("Bajo");
     
   } else if (medicionLuz >= 1000 && medicionLuz<2000){
@@ -607,16 +589,6 @@ bool evaluarMediciones ()
       estadoBuzzer = ACTIVADO;
       activarBuzzer();
       digitalWrite(pinLEDRojo, HIGH);
-      /*
-        if(estadoBuzzer == DESACTIVADO)
-        {
-        Serial.println("Se activa la alarma");
-        estadoBuzzer = ACTIVADO;
-        activarBuzzer();
-        } else {
-         Serial.println("Alarma ya activada, no la modifico");
-        }
-      */
 
     if (estadoFlama == DESACTIVADO)
     {
@@ -644,16 +616,6 @@ bool evaluarMediciones ()
     estadoBuzzer = ACTIVADO;
     activarBuzzer();
     digitalWrite(pinLEDRojo, HIGH);
-    /*
-      if(estadoBuzzer == DESACTIVADO)
-      {
-        Serial.println("Se activa la alarma");
-        estadoBuzzer = ACTIVADO;
-        activarBuzzer();
-      } else {
-         Serial.println("Alarma ya activada, no la modifico");
-      }
-    */
 
     if (estadoMovimiento == DESACTIVADO)
     {
@@ -667,30 +629,35 @@ bool evaluarMediciones ()
   }
 
   //Serial.print("Se evalua la temperatura y humedad: ");
-  if (medicionTemperatura <= TOPE_TEMPERATURA)
+ // Serial.print("Temperatura: ");
+ // Serial.println(medicionTemperatura);
+  if (medicionTemperatura > TOPE_TEMPERATURA)      // Si medicionTemperatura es NaN entonces medicionTemperatura != medicionTemperatura
   { 
-    //Serial.println("Temperatura en rango aceptable");
-  } 
-  else {
-    if (estadoVentilador == DESACTIVADO) {
-      modoEjecucion == MODO_DEBUG ? Serial.println("Temperatura excedida. Se enciende ventilador") : false;
-      estadoVentilador = ACTIVADO;
-      activarVentilador();
-      // Avisar al Apache
-
-    } else {
-      //Serial.println("Temperatura excedida. El ventilador ya esta encendido");
-
-    }
-
-    if (estadoTyH == DESACTIVADO)
-    {
-      modoEjecucion == MODO_DEBUG ? Serial.println("Temperatura excedida. Aviso al servidor Apache") : false;
-      estadoTyH = ACTIVADO;
-      enviarAlServidorWS(VENTILADOR_ACTIVADO, DISPARADOR_TEMPERATURA);
-    } else {
-      // Si esta activado es porque avise, entonces no voy a matar al servidor enviandole lo mismo 50 veces
-    }
+      if(isnan(medicionTemperatura) == 0){      
+        // Serial.println(medicionTemperatura);
+        if (estadoVentilador == DESACTIVADO) {
+          modoEjecucion == MODO_DEBUG ? Serial.println("Temperatura excedida. Se enciende ventilador") : false;
+          estadoVentilador = ACTIVADO;
+          activarVentilador();
+          // Avisar al Apache
+        } else {
+          //Serial.println("Temperatura excedida. El ventilador ya esta encendido");
+    
+        }
+   
+        if (estadoTyH == DESACTIVADO)
+        {
+          modoEjecucion == MODO_DEBUG ? Serial.println("Temperatura excedida. Aviso al servidor Apache") : false;
+          estadoTyH = ACTIVADO;
+          enviarAlServidorWS(VENTILADOR_ACTIVADO, DISPARADOR_TEMPERATURA);
+        } else {
+          // Si esta activado es porque avise, entonces no voy a matar al servidor enviandole lo mismo 50 veces
+        }
+     }
+   
+  } else {
+     
+       //Serial.println("Temperatura en rango aceptable");  
 
   }
 
@@ -737,12 +704,6 @@ String mostrarMediciones()
 
   return contenido;
 }
-
-/*float medirHumedad()
-{
-  return sensorTempyHum.readHumidity();
-}*/
-
 
 void activarVentilador()
 {
