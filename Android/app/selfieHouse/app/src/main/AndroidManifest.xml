@@ -37,8 +37,15 @@
         <activity android:name=".ControlActivity" />
         <activity
             android:name=".MenuControlActivity"
-            android:label="@string/title_activity_menu_control" />
+            android:label="Menu Control" />
         <activity android:name=".AccesoActivity"></activity>
+
+        <activity
+            android:name=".SolAccesoActivity"
+            android:label="Solicitudes de acceso"/>
+        <activity
+            android:name=".NotificacionActivity"
+            android:label="Notificaciones"/>
     </application>
 
 </manifest>

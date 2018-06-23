@@ -1,6 +1,7 @@
 package com.selfiehouse.selfiehouse;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -13,8 +14,10 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.selfiehouse.selfiehouse.Clases.AccesoSolicitud;
 import com.selfiehouse.selfiehouse.Clases.EstadoComponente;
+import com.selfiehouse.selfiehouse.NotificacionActivity;
 import com.selfiehouse.selfiehouse.Clases.Respuesta;
 import com.selfiehouse.selfiehouse.Clases.RespuestaActuadores;
 import com.selfiehouse.selfiehouse.Clases.RespuestaSensores;
@@ -50,7 +54,11 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
     private MenuItem cantidadDeSolicitudes;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
     ShakeListener mShaker;
+    ImageButton button_SolAcc, btn_Notif, btn_SolAcc;
     TextView tvTemperatura, tvMovimiento, tvLuz, tvFlama;
+
+
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -80,6 +88,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_control);
 
+       // btn_Notif= (ImageButton)findViewById(R.id.btnNotif);
+       // btn_SolAcc = (ImageButton)findViewById(R.id.btnSolAcceso);
         tvTemperatura = (TextView) findViewById(R.id.textViewTemperatura);
         tvMovimiento = (TextView) findViewById(R.id.textViewMovimiento);
         tvLuz = (TextView) findViewById(R.id.textViewLuz);
@@ -95,9 +105,30 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mEdit.setEnabled(false);
 
         mTextMessage = (TextView) findViewById(R.id.message);
-        final BottomNavigationView[] navigation = {(BottomNavigationView) findViewById(R.id.navigation)};
-        navigation[0].setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //final BottomNavigationView[] navigation = {(BottomNavigationView) findViewById(R.id.navigation)};
+        //navigation[0].setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+
+        btn_Notif = (ImageButton) findViewById(R.id.btnNotif);
+        btn_SolAcc = (ImageButton) findViewById(R.id.btnSolAcceso);
+
+        btn_Notif.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                Intent intento = new Intent (MenuControlActivity.this, NotificacionActivity.class);
+                startActivity(intento);
+            }
+        });
+
+        btn_SolAcc.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v){
+                // Estoy en MainActivity.this y voy hacia MainActivity.class
+                Intent solicitarAccesoIntent = new Intent (MenuControlActivity.this, SolAccesoActivity.class);
+                startActivity(solicitarAccesoIntent);
+            }
+
+        });
 
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
@@ -586,6 +617,10 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 System.out.println("Error: "+throwable.getMessage());
             }
         });
+
+
+
+
     }
 
     @Override

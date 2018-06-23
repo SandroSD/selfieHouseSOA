@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="65dp"
+    android:orientation="horizontal">
+
+
+    <TextView
+        android:id="@+id/tvFecha"
+        android:layout_width="150dp"
+        android:layout_height="25dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/darker_gray"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="60dp" />
+
+    <TextView
+        android:id="@+id/tvSolicitud"
+        android:layout_width="262dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/tvFecha"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+
+    <ImageButton
+        android:id="@+id/btnCamara"
+        android:layout_width="71dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginEnd="20dp"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/ic_solacc"
+        tools:layout_editor_absoluteX="297dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
