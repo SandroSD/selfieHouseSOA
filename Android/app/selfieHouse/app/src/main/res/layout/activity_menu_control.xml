@@ -192,17 +192,24 @@
 
                 <ImageButton
                     android:id="@+id/btnNotif"
-                    android:layout_width="176dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="119dp"
+                    android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/icono_notif" />
 
                 <ImageButton
                     android:id="@+id/btnSolAcceso"
-                    android:layout_width="194dp"
+                    android:layout_width="142dp"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/icono_solacc" />
+
+                <ImageButton
+                    android:id="@+id/btnUbicacion"
+                    android:layout_width="116dp"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/icono_gps" />
             </TableRow>
 
         </TableRow>
@@ -216,18 +223,26 @@
                 android:layout_height="match_parent" >
 
                 <TextView
-                    android:id="@+id/textView7"
-                    android:layout_width="176dp"
+                    android:id="@+id/tvNotificaciones"
+                    android:layout_width="119dp"
                     android:layout_height="wrap_content"
                     android:text="Notificaciones"
                     android:textAlignment="center" />
 
                 <TextView
-                    android:id="@+id/textViewSolAcc"
-                    android:layout_width="176dp"
+                    android:id="@+id/tvSolAcc"
+                    android:layout_width="149dp"
                     android:layout_height="wrap_content"
                     android:text="Solicitudes de Acceso"
                     android:textAlignment="center" />
+
+                <TextView
+                    android:id="@+id/tvUbicacion"
+                    android:layout_width="95dp"
+                    android:layout_height="match_parent"
+                    android:text="Ubicación"
+                    android:textAlignment="center" />
+
             </TableRow>
 
         </TableRow>

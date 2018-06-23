@@ -51,10 +51,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MenuControlActivity extends AppCompatActivity implements Constantes {
 
     private TextView mTextMessage;
-    private MenuItem cantidadDeSolicitudes;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
     ShakeListener mShaker;
-    ImageButton button_SolAcc, btn_Notif, btn_SolAcc;
+    ImageButton btn_Notif, btn_SolAcc, btn_Ubicacion;
     TextView tvTemperatura, tvMovimiento, tvLuz, tvFlama;
 
 
@@ -88,8 +87,6 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_control);
 
-       // btn_Notif= (ImageButton)findViewById(R.id.btnNotif);
-       // btn_SolAcc = (ImageButton)findViewById(R.id.btnSolAcceso);
         tvTemperatura = (TextView) findViewById(R.id.textViewTemperatura);
         tvMovimiento = (TextView) findViewById(R.id.textViewMovimiento);
         tvLuz = (TextView) findViewById(R.id.textViewLuz);
@@ -105,12 +102,11 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mEdit.setEnabled(false);
 
         mTextMessage = (TextView) findViewById(R.id.message);
-        //final BottomNavigationView[] navigation = {(BottomNavigationView) findViewById(R.id.navigation)};
-        //navigation[0].setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
+        /* Botones Notificaciones y Solicitudes */
 
         btn_Notif = (ImageButton) findViewById(R.id.btnNotif);
         btn_SolAcc = (ImageButton) findViewById(R.id.btnSolAcceso);
+        btn_Ubicacion = (ImageButton) findViewById(R.id.btnUbicacion);
 
         btn_Notif.setOnClickListener(new View.OnClickListener() {
 
@@ -129,6 +125,16 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
             }
 
         });
+
+        btn_Ubicacion.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                Intent intento = new Intent (MenuControlActivity.this, UbicacionActivity.class);
+                startActivity(intento);
+            }
+        });
+
+        /* Variables para peticiones HTTP*/
 
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
@@ -163,7 +169,6 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                Toast.makeText(MenuControlActivity.this, "*Shake Detectado*" , Toast.LENGTH_SHORT).show();
                 Toast.makeText(MenuControlActivity.this, "Actualizando datos de sensores" , Toast.LENGTH_SHORT).show();
                 ComandoArduino servicioAccion = retrofitC.create( ComandoArduino.class);
                 Call<RespuestaSensores> serviciosCall = servicioAccion.infoSensores();
@@ -573,6 +578,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         });
 
 
+
         /* Obtengo la cantidad de solicitudes*/
         AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
         Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);
@@ -595,10 +601,6 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                 // set dialog message
                 alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-                alertDialogBuilder.setCancelable(false).setNegativeButton("Ver después", new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 });
