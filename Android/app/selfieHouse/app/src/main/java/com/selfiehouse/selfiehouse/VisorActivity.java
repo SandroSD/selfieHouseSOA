@@ -11,14 +11,14 @@ import android.widget.ImageView;
 import com.selfiehouse.selfiehouse.Clases.Constantes;
 
 public class VisorActivity extends AppCompatActivity {
-
+    int idSolicitud;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visor);
         WebView webView = new WebView(this);
         setContentView(webView);
-        webView.loadUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/src/plugins/verPerfil?op=");
-
+        idSolicitud = getIntent().getIntExtra("idSolicitud",0);
+        webView.loadUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/src/plugins/verPerfil?op="+idSolicitud);
     }
 }

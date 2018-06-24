@@ -1,61 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="65dp"
-    android:orientation="horizontal">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="90dp"
+        android:layout_height="69dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_solacc" />
 
     <TextView
         android:id="@+id/tvFecha"
-        android:layout_width="150dp"
-        android:layout_height="25dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="294dp"
+        android:layout_height="32dp"
+        android:layout_below="@+id/tvSolicitud"
+        android:layout_toEndOf="@+id/imageView4"
+        android:textAlignment="center"
         android:text="TextView"
-        android:textAlignment="textStart"
         android:textColor="@android:color/darker_gray"
         tools:layout_editor_absoluteX="30dp"
-        tools:layout_editor_absoluteY="60dp" />
+        tools:layout_editor_absoluteY="16dp" />
+
 
     <TextView
         android:id="@+id/tvSolicitud"
-        android:layout_width="262dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="294dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/tvFecha"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/imageView4"
+        android:layout_weight="3"
         android:text="TextView"
-        android:textAlignment="textStart"
+        android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        tools:layout_editor_absoluteX="30dp"
-        tools:layout_editor_absoluteY="16dp" />
-
-
-    <ImageButton
-        android:id="@+id/btnCamara"
-        android:layout_width="71dp"
-        android:layout_height="60dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginEnd="20dp"
-        android:background="@android:color/transparent"
-        app:srcCompat="@drawable/ic_solacc"
-        tools:layout_editor_absoluteX="297dp"
-        tools:layout_editor_absoluteY="16dp" />
+        android:textSize="18dp" />
 
 </RelativeLayout>
-
-
-
-
-
-
-
-

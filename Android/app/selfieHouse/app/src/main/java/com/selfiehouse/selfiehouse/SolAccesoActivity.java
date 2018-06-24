@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -41,7 +42,7 @@ public class SolAccesoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_solicitud_acceso);
 
-        button_Acesso = (ImageButton) findViewById(R.id.btnCamara);
+        //button_Acesso = (ImageButton) findViewById(R.id.btnCamara);
         listView = (ListView) findViewById(R.id.lvSolicitud);
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
@@ -61,7 +62,7 @@ public class SolAccesoActivity extends AppCompatActivity {
                 .create();
 
 
-/*        button_Acesso.setOnClickListener(new View.OnClickListener() {
+       /*button_Acesso.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v){
                 Intent visorFotoIntent = new Intent (SolAccesoActivity.this, VisorActivity.class);
 
@@ -70,6 +71,8 @@ public class SolAccesoActivity extends AppCompatActivity {
                 //startActivity(visorFotoIntent);
             }
         });*/
+
+
 
 
         /* Obtengo la cantidad de solicitudes*/
@@ -94,6 +97,14 @@ public class SolAccesoActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<AccesoSolicitud>> call, Throwable throwable) {
                 System.out.println("Error: "+throwable.getMessage());
+            }
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent visorFotoIntent = new Intent (SolAccesoActivity.this, VisorActivity.class);
+                visorFotoIntent.putExtra("idSolicitud",listSolicitud.get(position).getId());
+                startActivity(visorFotoIntent);
             }
         });
     }
