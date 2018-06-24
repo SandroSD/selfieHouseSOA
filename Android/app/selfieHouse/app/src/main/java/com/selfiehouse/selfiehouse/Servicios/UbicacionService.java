@@ -12,6 +12,8 @@ public interface UbicacionService {
     // ..:8080/ws/AndroidReceiverWs?pull_solicitudes=true
 
     @GET("AndroidReceiverWs")
-        // Estoy creando un metodo que formara la URL. El parametro sera pull_solicitudes
     Call<Ubicacion> getUbicacion(@Query("pull_ubicacion") boolean valor);
+
+    @GET("AndroidReceiverWs")
+    Call<Ubicacion> setUbicacion(@Query("push_ubicacion") boolean valor, @Query("latitud") double latitud,@Query("longitud") double longitud);
 }

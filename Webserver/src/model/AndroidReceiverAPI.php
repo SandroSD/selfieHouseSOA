@@ -8,7 +8,44 @@ class AndroidReceiverAPI{
         switch ($metodo) {
             case 'GET':
 				
-				if (isset($_GET['pull_solicitudes'])){
+				if (isset($_GET['nuevo_codigo']) && isset($_GET['tipo_codigo'])){
+				   
+				    $tipo = $_GET['tipo_codigo'];
+				    
+				    // Genera un codigo aleatorio de 6 cifras
+				    do {
+				        
+				        $codigo = Conexion::number_pad(rand(0,999999),6);
+				    
+				    } while(!Conexion::verificarCodigoExistente($codigo));
+				    
+				    if(Conexion::insertarCodigoAcceso($codigo,$tipo)){
+				        echo $codigo;
+				    } else {
+				        Conexion::agregarAlLog(2,"AndroidReceiverAPI:: Error al insertar un codigo de acceso nuevo");
+						echo "Error";
+				    }
+				    
+				}
+				
+				# Esto sera accedido por un thread de la aplicacion Android para chequear si hay solicitudes nuevas de acceso
+				else if (isset($_GET['push_ubicacion']) && isset($_GET['latitud']) && isset($_GET['longitud'])){
+					
+					$latitud = $_GET['latitud'];
+					$longitud = $_GET['longitud'];
+						
+					if(Conexion::setUbicacion($latitud,$longitud)){
+						$comentario = "Se definio la ubicacion del sistema embebido - Latitud: ".$latitud." - Longitud: ".$longitud;
+						Conexion::nuevaNotificacion($comentario);
+						Conexion::agregarAlLog(1, $comentario);
+						echo "OK";
+					} else {
+						
+						Conexion::agregarAlLog(2,"AndroidReceiverAPI:: Error al setear la ubicacion del embebido");
+						echo "Error";
+					}		
+					
+				} else if (isset($_GET['pull_solicitudes'])){
 					
 					$solicitudes = Conexion::getSolicitudesDeAcceso();
 					
@@ -358,32 +395,17 @@ class AndroidReceiverAPI{
                 } 
 				break;
 				
-				case 'POST':
+				case 'GET':
 				
 				# Con esto controlo el login a la casa, puede ser acceso de puerta o acceso al administrador
 				
-				# Esto sera accedido por un thread de la aplicacion Android para chequear si hay solicitudes nuevas de acceso
-				if (isset($_POST['push_ubicacion']) && isset($_POST['latitud']) && isset($_POST['longitud'])){
-					
-					$latitud = $_POST['latitud'];
-					$longitud = $_POST['longitud'];
-						
-					if(Conexion::setUbicacion($latitud,$longitud)){
-						Conexion::agregarAlLog(1,"AndroidReceiverAPI:: Se definio la ubicacion del sistema embebido desde la IP: ".$_SERVER['REMOTE_ADDR']);
-						echo "OK";
-					} else {
-						
-						Conexion::agregarAlLog(2,"AndroidReceiverAPI:: Error al setear la ubicacion del embebido");
-						echo "Error";
-					}		
-					
-				}
+				
 				/* Se ejecuta ante la solicitud de un nuevo codigo con tipo de acceso.
 				    Se recibe un true en nuevo_codigo y el tipo de acceso solicitado (222 ó 777)
 				    Genera un codigo random de 6 cifras.
 				    Si sale todo OK devuelve ese codigo.
 				*/
-				else if (isset($_POST['nuevo_codigo']) && isset($_POST['tipo_codigo'])){
+				if (isset($_POST['nuevo_codigo']) && isset($_POST['tipo_codigo'])){
 				    
 				    $tipo = $_POST['tipo_codigo'];
 				    

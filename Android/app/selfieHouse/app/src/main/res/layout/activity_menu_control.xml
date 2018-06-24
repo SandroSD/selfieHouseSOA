@@ -192,24 +192,31 @@
 
                 <ImageButton
                     android:id="@+id/btnNotif"
-                    android:layout_width="119dp"
+                    android:layout_width="91dp"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/icono_notif" />
 
                 <ImageButton
                     android:id="@+id/btnSolAcceso"
-                    android:layout_width="142dp"
+                    android:layout_width="83dp"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/icono_solacc" />
 
                 <ImageButton
                     android:id="@+id/btnUbicacion"
-                    android:layout_width="116dp"
+                    android:layout_width="87dp"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/icono_gps" />
+
+                <ImageButton
+                    android:id="@+id/btnCodigo"
+                    android:layout_width="83dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/icono_codigo" />
             </TableRow>
 
         </TableRow>
@@ -224,23 +231,31 @@
 
                 <TextView
                     android:id="@+id/tvNotificaciones"
-                    android:layout_width="119dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Notificaciones"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvSolAcc"
-                    android:layout_width="149dp"
+                    android:layout_width="84dp"
                     android:layout_height="wrap_content"
                     android:text="Solicitudes de Acceso"
                     android:textAlignment="center" />
 
                 <TextView
                     android:id="@+id/tvUbicacion"
-                    android:layout_width="95dp"
+                    android:layout_width="87dp"
                     android:layout_height="match_parent"
                     android:text="Ubicación"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:id="@+id/tvGenerarCodigo"
+                    android:layout_width="82dp"
+                    android:layout_height="match_parent"
+                    android:text="Generar código"
                     android:textAlignment="center" />
 
             </TableRow>

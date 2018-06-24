@@ -53,7 +53,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
     private TextView mTextMessage;
     Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
     ShakeListener mShaker;
-    ImageButton btn_Notif, btn_SolAcc, btn_Ubicacion;
+    ImageButton btn_Notif, btn_SolAcc, btn_Ubicacion, btn_GenCod;
     TextView tvTemperatura, tvMovimiento, tvLuz, tvFlama;
 
 
@@ -107,6 +107,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         btn_Notif = (ImageButton) findViewById(R.id.btnNotif);
         btn_SolAcc = (ImageButton) findViewById(R.id.btnSolAcceso);
         btn_Ubicacion = (ImageButton) findViewById(R.id.btnUbicacion);
+        btn_GenCod = (ImageButton) findViewById(R.id.btnCodigo);
 
         btn_Notif.setOnClickListener(new View.OnClickListener() {
 
@@ -133,7 +134,13 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 startActivity(intento);
             }
         });
+        btn_GenCod.setOnClickListener(new View.OnClickListener() {
 
+            public void onClick(View v) {
+                Intent intento = new Intent (MenuControlActivity.this, GenerarCodigoActivity.class);
+                startActivity(intento);
+            }
+        });
         /* Variables para peticiones HTTP*/
 
         final Retrofit retrofit = new Retrofit.Builder()
