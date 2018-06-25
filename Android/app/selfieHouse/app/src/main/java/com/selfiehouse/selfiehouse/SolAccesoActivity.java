@@ -73,11 +73,14 @@ public class SolAccesoActivity extends AppCompatActivity {
                 listSolicitud = response.body();
                 //cantidadDeSolicitudes = (TextView) findViewById(R.id.textCantidadDeSolicitudes);
                 //cantidadDeSolicitudes.setText("Solicitudes: "+as.size());
+                if(listSolicitud.isEmpty()){
+                    Toast.makeText(SolAccesoActivity.this, "No hay solicitudes de acceso", Toast.LENGTH_LONG).show();
+                } else {
+                    //Enlazo mi adaptador personalizado al listview
+                    adapter = new SolAccAdapter(SolAccesoActivity.this,R.layout.item_solicitud,listSolicitud);
 
-                //Enlazo mi adaptador personalizado al listview
-                adapter = new SolAccAdapter(SolAccesoActivity.this,R.layout.item_solicitud,listSolicitud);
-
-                listView.setAdapter(adapter);
+                    listView.setAdapter(adapter);
+                }
 
             }
 

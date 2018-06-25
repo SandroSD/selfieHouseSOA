@@ -1,14 +1,32 @@
 <?php
 require_once '../private/Config.php';
+require_once '../model/Conexion.model.php';
 
-$conn = new mysqli(SERVER,USER,PASS,DB);
-
-$idPersona = $_GET['op'];
-
-$query = "SELECT * FROM acceso_solicitud WHERE id=$idPersona";
-
-$resultado = $conn->query($query)->fetch_assoc();   
-$ruta = "../../".$resultado['foto'];
+if(isset($_POST['op'])){
+	$solicitud = $_POST['op'];
+	
+	if(isset($_POST['btnAceptar'])){
+		$nuevoEstado= 0;
+	} else if (isset($_POST['btnRechazar'])){
+		$nuevoEstado= 2;
+	}	
+	if(Conexion::cambiarEstadoSolicitud($solicitud,$nuevoEstado)){
+		if($nuevoEstado == 2){
+			$mensaje = "<br><br><br><font color=red>Solicitud rechazada.</font>";
+		} else {
+			$mensaje = "<br><br><br><font color=blue>Acceso concedido. Puerta destrabada.</font>";
+		}		
+	} else {
+		$mensaje = "<br><br><br>Hubo un error al realizar la acción solicitada";
+	}	
+	
+} else {
+	$conn = new mysqli(SERVER,USER,PASS,DB);
+	$idPersona = $_GET['op'];
+	$query = "SELECT * FROM acceso_solicitud WHERE id=$idPersona";
+	$resultado = $conn->query($query)->fetch_assoc();   
+	$ruta = "../../".$resultado['foto'];	
+}
 
 ?>
 <!DOCTYPE html>
@@ -27,18 +45,37 @@ $ruta = "../../".$resultado['foto'];
 </head>
 <body>
 <div class="container-fluid">
-    <div class="row">
+    <?php
+	if(isset($_POST['op'])){
+	?>
+	<div class="row">
         <div class='col-12 col-md-5 col-lg-5 offset-md-3 offset-lg-3'>            
-            <div id="divFoto">
-                <span>Esta persona solicita acceso a la casa</span>
-                <img src="<?php echo $ruta; ?>" id="foto">
-                <div class="col-md-5 offset-md-4">
-                    <button class="btn btn-success" id="btnAceptar" onClick="cambiarEstado(<?php echo $_GET['op'];?>)">Aceptar</button>
-                    <button class="btn btn-danger" id="btnRechazar" onClick="rechazar(<?php echo $_GET['op'];?>)">Rechazar</button>
-                </div>                
-            </div>              
+            <h2 align=center><?php echo $mensaje;?></h2>
         </div>
-    </div>    
+    </div> 
+	
+	<?php
+	} else {
+	?>
+	
+	<div class="row">
+        <div class='col-12 col-md-5 col-lg-5 offset-md-3 offset-lg-3'>            
+            <form method="POST" action="">
+				<div id="divFoto">
+					<span>Esta persona solicita acceso a la casa</span>
+					<img src="<?php echo $ruta; ?>" id="foto">
+					<div class="col-md-5 offset-md-4">
+						<input type=submit class="btn btn-success" name="btnAceptar" value="Aceptar"></input>
+						<input type=submit class="btn btn-danger" name="btnRechazar" value="Rechazar"></input>
+						<input type="hidden" name="op" value="<?php echo $_GET['op'];?>" />
+					</div>                
+				</div> 
+			</form>
+        </div>
+    </div> 
+	<?php
+	}
+	?>	
 </div>    
 </body>
 </html>

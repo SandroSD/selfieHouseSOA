@@ -375,6 +375,24 @@ class Conexion {
         
     }
     
+	public function cambiarEstadoSolicitud($solicitud, $estadoNuevo)
+    {
+        $stmt = Conexion::conectar()->prepare("update acceso_solicitud set estado=:estado where id=:solicitud;");
+        $stmt->bindParam(":estado", $estadoNuevo, PDO::PARAM_INT);
+        $stmt->bindParam(":solicitud", $solicitud, PDO::PARAM_INT);
+        
+        if($stmt->execute()){
+            $stmt = null;
+            return true;
+        } else {
+            Conexion::agregarAlLog(2,"Conexion::cambiarEstadoSolicitud() - ".$stmt->errorCode()." - ". $stmt->errorInfo());
+            $stmt = null;
+            return false;
+        }
+        
+    }
+	
+	
     public function disparadorLabel($disparador)
     {
         if ($disparador == DISPARADOR_MOVIMIENTO){
