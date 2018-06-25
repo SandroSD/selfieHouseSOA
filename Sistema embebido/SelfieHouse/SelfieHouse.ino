@@ -33,7 +33,7 @@
 
 #define CANTIDAD_INTENTOS_CONEXION 3
 #define TIMEOUT_CONEXION    10
-#define TIEMPO_PARPADEO     400       // ms
+#define TIEMPO_PARPADEO     300       // ms
 #define ACTIVADO        1
 #define DESACTIVADO       0
 
@@ -56,6 +56,7 @@
 #define DISPARADOR_TEMPERATURA  2002
 #define DISPARADOR_LUZ          2003
 #define DISPARADOR_MANUAL       2004
+#define DISPARADOR_AUTOMATICO       2005
 
 #define ID_TRABA      1
 #define ID_BUZZER      2
@@ -86,7 +87,6 @@ int pinSensorFlama = 12;            // GPIO12 - D6
 /* Pines analogicos */
 int pinSensorLuz = A0;        // A0
 
-
 /* Sensores tipo objeto */
 DHT sensorTempyHum(pinSensorTempyHum, DHTTYPE);
 Servo servoTrabaPuerta;
@@ -108,9 +108,9 @@ WiFiClient client;              // Cliente que avisa al servidor Apache
 
 
 int timeoutConexion = 10 ;      // 5 segundos para conectarse al Wifi
-const char* ssid = "WF_selfieHouse";    //WF_selfieHouse
-const char* password = "selfiehouse"; //selfiehouse
-const char * ipServidorApache = "192.168.1.10";              // Servidor Apache - Hay que disponer de una IP fija
+const char* ssid = "WF_selfieHouse";    
+const char* password = "selfiehouse"; 
+const char * ipServidorApache = "192.168.1.10";              // Servidor Apache
 const uint16_t puertoIpServidorApache = 8080;                  // Puerto Servidor Apache
 
 /***************************************************************************
@@ -178,11 +178,11 @@ void setup()
           parpadearLed(pinLEDVerde);
           Serial.println("OK!");
           Serial.println("Reiniciando estados en la base de datos");
-          enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_MANUAL);
+          enviarAlServidorWS(REINCIO_ESTADOS,DISPARADOR_AUTOMATICO);
           
           Serial.println("Atendiendo peticiones y censado sensores...");
           digitalWrite(pinLEDVerde, HIGH);
-          startMillis = millis();   //initial start time
+          startMillis = millis();   // Tiempo de inicio para tomar mediciones
         
         } else {
           digitalWrite(pinLEDRojo, HIGH);
@@ -246,7 +246,6 @@ bool conectarAWIFI()
   do {
 
     WiFi.begin(ssid, password);
-    // WiFi.config(ip, gateway, subred);      // Si le llegamos a fijar la IP
     WiFi.mode(WIFI_STA);
 
     Serial.print("\n\tIntento ");
@@ -349,10 +348,7 @@ bool iniciarWebserver()
     Serial.println("ERROR");
     delay(60000000);
     return false;
-    
   }
-  
-  
   
 }
 
@@ -373,14 +369,16 @@ bool iniciarCliente()
 /***************************************************************************
              FUNCIONES DE ACCION ANTE UNA PETICION DEL WEBSERVER
 ***************************************************************************/
-void activarSelfieHouseWS(){
+void activarSelfieHouseWS()
+s{
   Serial.println("Instruccion recibida: Estado selfieHouse ACTIVADO");
   estadoSelfieHouse = ACTIVADO;
   digitalWrite(pinLEDAzul, HIGH);
   enviarRespuesta("OK");
 }
 
-void desactivarSelfieHouseWS(){
+void desactivarSelfieHouseWS()
+{
   Serial.println("Instruccion recibida: Estado selfieHouse DESACTIVADO");
   estadoSelfieHouse = DESACTIVADO;
   digitalWrite(pinLEDAzul, LOW);
@@ -488,14 +486,7 @@ void enviarAlServidorWS(int accion, int disparador)
 
 void enviarRespuesta(String respuesta)
 {
-  //StaticJsonBuffer<200> jsonBuffer;
- // JsonObject& json = jsonBuffer.createObject();
- // json["respuesta"] = respuesta; 
-  
- // String jsonChar;
- // json.prettyPrintTo(jsonChar);
   server.send(200, "text/plain", respuesta);
- // server.send(200, "application/json", jsonChar); 
 }
 
 bool iniciarSensores()
@@ -722,10 +713,10 @@ void trabarPuerta()
 
   if (estadoTraba == DESACTIVADO)
   {
-    for (int pos = 0; pos <= 90; pos += 1) // goes from 0 degrees to 90 degrees
-    { // in steps of 1 degree
-      servoTrabaPuerta.write(pos);     // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
+    for (int pos = 0; pos <= 90; pos += 1) // Va de los 0 grados a los 90 grados
+    { // ...en saltos de 1 grado
+      servoTrabaPuerta.write(pos);     // Le digo al servo que vaya a la posicion a traves de la variable "pos"
+      delay(15);                       // Espera 15ms para que el servo alcance la posicion
     }
     estadoTraba = ACTIVADO;
   } else {
@@ -738,10 +729,10 @@ void destrabarPuerta()
 
   if (estadoTraba == ACTIVADO)
   {
-    for (int pos = 90; pos >= 0; pos -= 1) // goes from 90 degrees to 0 degrees
+    for (int pos = 90; pos >= 0; pos -= 1) // Va de los 90 grados a los 0 grados
     {
-      servoTrabaPuerta.write(pos);      // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
+      servoTrabaPuerta.write(pos);      // Le digo al servo que vaya a la posicion a traves de la variable "pos"
+      delay(15);                       // Espera 15ms para que el servo alcance la posicion
     }
     estadoTraba = DESACTIVADO;
   } else {
@@ -758,14 +749,11 @@ void parpadearLed(int pin)
 }
 
 
-
 void activarBuzzer()
 {
   estadoBuzzer = ACTIVADO;
   tone(pinBuzzer, 500, 1000);
-  //delay(1000);
   tone(pinBuzzer, 1000, 1000);
-  //delay(1000);
 }
 
 void desactivarBuzzer()
@@ -773,6 +761,7 @@ void desactivarBuzzer()
   estadoBuzzer = DESACTIVADO;
   noTone(pinBuzzer);
 }
+
 /***************************************************************************
              FUNCIONES DE RESPUESTA DE WEBSERVER
 ***************************************************************************/
@@ -820,7 +809,6 @@ void infoActuadores()
   digitalRead(pinLEDRojo) == HIGH ? json["ledrojo"] = "Encendido" : json["ledrojo"] = "Apagado"; 
   digitalRead(pinLEDVerde) == HIGH ? json["ledverde"] = "Encendido" : json["ledverde"] = "Apagado"; 
  
-
   json.prettyPrintTo(Serial);
   String jsonChar;
   json.prettyPrintTo(jsonChar);
@@ -844,5 +832,3 @@ void notFound()
   server.send(404, "text/html", message);
   //parpadearLed(pinAuxiliar);
 }
-
-
