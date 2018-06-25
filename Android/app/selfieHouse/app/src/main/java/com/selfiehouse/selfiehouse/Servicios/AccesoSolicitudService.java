@@ -18,7 +18,7 @@ public interface AccesoSolicitudService {
     // luego obtiene la respuesta como un JSON que lo metera un una lista de objetos AccesoSolicitud
 
     Call<List<AccesoSolicitud>> getAccesoSolicitud(@Query("pull_solicitudes") boolean valor);
-    Call<List<CantidadPendiente>> getCantidadesPendientes(@Query("pull_cantidades_pendientes") boolean valor);
+
 
 
 }

@@ -288,8 +288,6 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
             @Override
             public void onResponse(Call<RespuestaActuadores> call, Response<RespuestaActuadores> response) {
-
-
                 if(response.body().getSelfiehouse().equals("Activado")){
                     switchSistema.setChecked(true);
                 }

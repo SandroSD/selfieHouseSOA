@@ -12,5 +12,6 @@ public interface AccionService {
         // luego obtiene la respuesta como un JSON que lo metera un una lista de objetos AccesoSolicitud
 
     Call<Respuesta> enviarAccion(@Query("accion") int accion, @Query("disparador") int disparador);
+    @GET("AndroidReceiverWs")
     Call<Respuesta> encenderVentilador(@Query("fanon") boolean accion);
 }

@@ -85,7 +85,8 @@ define("DISPARADOR_MOVIMIENTO",2000);
 define("DISPARADOR_LLAMA",2001);
 define("DISPARADOR_TEMPERATURA",2002);
 define("DISPARADOR_LUZ",2003);
-define("DISPARADOR_MANUAL",2003);
+define("DISPARADOR_MANUAL",2004);
+define("DISPARADOR_AUTOMATICO",2005);
 
 /***************************************
  ******** TIPOS DE ACCESO ****************

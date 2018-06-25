@@ -62,19 +62,6 @@ public class SolAccesoActivity extends AppCompatActivity {
                 .create();
 
 
-       /*button_Acesso.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v){
-                Intent visorFotoIntent = new Intent (SolAccesoActivity.this, VisorActivity.class);
-
-              //  Toast.makeText(SolAccesoActivity.this,"Id: " + listView.getItemAtPosition(listView.getId()),Toast.LENGTH_LONG).show();
-                //visorFotoIntent.putExtra("id",)
-                //startActivity(visorFotoIntent);
-            }
-        });*/
-
-
-
-
         /* Obtengo la cantidad de solicitudes*/
         AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
         Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);

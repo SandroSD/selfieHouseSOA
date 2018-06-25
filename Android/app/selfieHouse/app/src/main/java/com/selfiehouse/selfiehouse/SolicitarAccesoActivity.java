@@ -85,10 +85,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
         GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
         Glide.with(this).load(R.drawable.world).into(imageViewTarget);
 
-
-
-
-        /**
+      /**
          * Obtengo la ubicacion del sistema embebido
          *
          */
@@ -140,12 +137,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
 
           } else {
 
-
         }
-
-
-
-
 
     }
 
@@ -188,12 +180,7 @@ public class SolicitarAccesoActivity extends AppCompatActivity  {
 
             }
 
-
-
         }
     }
 
-
-
 }
-

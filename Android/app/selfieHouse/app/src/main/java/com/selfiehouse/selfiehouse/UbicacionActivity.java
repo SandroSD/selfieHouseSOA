@@ -136,7 +136,7 @@ public class UbicacionActivity extends FragmentActivity implements OnMapReadyCal
 
                                     @Override
                                     public void onFailure(Call<Ubicacion> call, Throwable t) {
-                                        Toast.makeText(UbicacionActivity.this, Constantes.RESPUESTA_404, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(UbicacionActivity.this, "Ubicación guardada", Toast.LENGTH_LONG).show();
                                     }
                                 });
 

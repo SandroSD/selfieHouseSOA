@@ -13,7 +13,6 @@ public interface UbicacionService {
 
     @GET("AndroidReceiverWs")
     Call<Ubicacion> getUbicacion(@Query("pull_ubicacion") boolean valor);
-
     @GET("AndroidReceiverWs")
     Call<Ubicacion> setUbicacion(@Query("push_ubicacion") boolean valor, @Query("latitud") double latitud,@Query("longitud") double longitud);
 }

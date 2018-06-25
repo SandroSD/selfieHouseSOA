@@ -38,15 +38,12 @@ public class AccesoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_acceso);
 
         tipoAcceso = Integer.valueOf(getIntent().getStringExtra("tipoAcceso"));
-
         button_Acc = (Button)findViewById(R.id.buttonAcceso);
-        //textoPassword = R.id.editTextCodigoAcceso;
 
         /* Click listener del boton Acceso */
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
                 .addConverterFactory(ScalarsConverterFactory.create())
-                //.addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
 
@@ -95,38 +92,6 @@ public class AccesoActivity extends AppCompatActivity {
                         }
                     });
 
-
-
-                    /*serviciosCall.enqueue(new Callback<Respuesta>() {
-                        @Override
-                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
-                            System.out.println(tipoAcceso);
-                            System.out.println(Constantes.ACCESO_CONTROL);
-                            if(response.body().getRespuesta().equals("Autorizado")){
-
-                                if(tipoAcceso == Constantes.ACCESO_CONTROL)
-                                {
-                                    Intent controlIntent = new Intent (AccesoActivity.this, MenuControlActivity.class);
-                                    startActivity(controlIntent);
-                                } else {
-                                    Toast.makeText(AccesoActivity.this,"Acceso autorizado, puerta destrabada",Toast.LENGTH_SHORT).show();
-                                }
-
-
-                            } else if(response.body().getRespuesta().equals("No autorizado")){
-                                Toast.makeText(AccesoActivity.this,"No autorizado",Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(AccesoActivity.this,"Codigo incorrecto",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            Toast.makeText(AccesoActivity.this,"Error de conexion",Toast.LENGTH_SHORT).show();
-                        }
-
-                    });*/
                 } else {
                     Toast.makeText(AccesoActivity.this, "El codigo no puede estar vacío", Toast.LENGTH_SHORT).show();
 

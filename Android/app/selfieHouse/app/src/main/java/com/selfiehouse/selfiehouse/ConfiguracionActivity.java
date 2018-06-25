@@ -20,10 +20,6 @@ import com.selfiehouse.selfiehouse.Clases.ShakeListener;
 
 public class ConfiguracionActivity extends AppCompatActivity {
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);      // No permite que la activity se adapte a la rotacion de pantalla

@@ -89,6 +89,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy()
     {
         super.onDestroy();
-        //Toast.makeText(getApplicationContext(),"Cerrando Inicio",Toast.LENGTH_LONG).show();
+
     }
 }
