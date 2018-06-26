@@ -38,7 +38,7 @@
 #define DESACTIVADO       0
 
 #define TOPE_FLAMA        1
-#define TOPE_TEMPERATURA    30
+#define TOPE_TEMPERATURA    23
 #define TOPE_LUZ        10
 
 #define PUERTA_TRABADA        1000
@@ -370,7 +370,7 @@ bool iniciarCliente()
              FUNCIONES DE ACCION ANTE UNA PETICION DEL WEBSERVER
 ***************************************************************************/
 void activarSelfieHouseWS()
-s{
+{
   Serial.println("Instruccion recibida: Estado selfieHouse ACTIVADO");
   estadoSelfieHouse = ACTIVADO;
   digitalWrite(pinLEDAzul, HIGH);
