@@ -47,4 +47,7 @@ public interface ComandoArduino {
     @GET("infoActuadores")
     Call<RespuestaActuadores> infoActuadores();
 
+    @GET("redoff")
+    Call<Respuesta> apagarLEDRojo();
+
 }

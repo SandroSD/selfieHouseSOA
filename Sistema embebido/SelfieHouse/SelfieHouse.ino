@@ -186,6 +186,7 @@ void setup()
         
         } else {
           digitalWrite(pinLEDRojo, HIGH);
+          digitalWrite(pinLEDVerde, LOW);
           Serial.println("ERROR");
           delay(60000000);
         }
@@ -752,8 +753,12 @@ void parpadearLed(int pin)
 void activarBuzzer()
 {
   estadoBuzzer = ACTIVADO;
-  tone(pinBuzzer, 500, 1000);
+  tone(pinBuzzer, 400, 1000);
+  tone(pinBuzzer, 700, 1000);
   tone(pinBuzzer, 1000, 1000);
+  tone(pinBuzzer, 1000, 1000);
+  tone(pinBuzzer, 700, 1000);
+  tone(pinBuzzer, 400, 1000);
 }
 
 void desactivarBuzzer()

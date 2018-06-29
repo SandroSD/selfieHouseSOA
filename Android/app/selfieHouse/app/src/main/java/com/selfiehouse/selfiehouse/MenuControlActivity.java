@@ -1,5 +1,6 @@
 package com.selfiehouse.selfiehouse;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -8,7 +9,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
@@ -51,11 +56,39 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MenuControlActivity extends AppCompatActivity implements Constantes {
 
     private TextView mTextMessage;
-    Switch switchSistema, switchDEBUG, switchBuzzer, switchVentilador, switchTraba;
+    private int cantidadProximidad = 0, cantidadSolitudesAccesoInicial = 0;
+    Switch switchSistema, switchBuzzer, switchVentilador, switchTraba;
     ShakeListener mShaker;
     ImageButton btn_Notif, btn_SolAcc, btn_Ubicacion, btn_GenCod;
-    TextView tvTemperatura, tvMovimiento, tvLuz, tvFlama;
+    TextView tvTemperatura, tvMovimiento, tvLuz, tvFlama, tvSolicitudesAcceso;
 
+    /* Variables para peticiones HTTP*/
+    final Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+    // Para setear Timeout
+    OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60,TimeUnit.SECONDS)
+            .writeTimeout(60,TimeUnit.SECONDS)
+            .build();
+
+    final Retrofit retrofitB = new Retrofit.Builder()
+            .baseUrl("http://" + Constantes.IP_ARDUINO + "/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+    Gson gson = new GsonBuilder()
+            .setLenient()
+            .create();
+
+    final Retrofit retrofitC = new Retrofit.Builder()
+            .baseUrl("http://" + Constantes.IP_ARDUINO + "/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build();
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -91,6 +124,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         tvMovimiento = (TextView) findViewById(R.id.textViewMovimiento);
         tvLuz = (TextView) findViewById(R.id.textViewLuz);
         tvFlama = (TextView) findViewById(R.id.textViewFuego);
+        tvSolicitudesAcceso = (TextView) findViewById(R.id.tvSolAcc);
 
         /* Cambio los titulos para que no sean editables */
 
@@ -141,34 +175,9 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 startActivity(intento);
             }
         });
-        /* Variables para peticiones HTTP*/
 
-        final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://" + Constantes.IP_APACHE + ":" + Constantes.PUERTO_APACHE + "/selfieHouse/ws/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        // Para setear Timeout
-        OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(60,TimeUnit.SECONDS)
-                .writeTimeout(60,TimeUnit.SECONDS)
-                .build();
 
-        final Retrofit retrofitB = new Retrofit.Builder()
-                .baseUrl("http://" + Constantes.IP_ARDUINO + "/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-        final Retrofit retrofitC = new Retrofit.Builder()
-                .baseUrl("http://" + Constantes.IP_ARDUINO + "/")
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
 
         /* Deteccion de Shake */
 
@@ -176,32 +185,24 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mShaker.setOnShakeListener(new ShakeListener.OnShakeListener () {
             public void onShake()
             {
-                Toast.makeText(MenuControlActivity.this, "Actualizando datos de sensores" , Toast.LENGTH_SHORT).show();
-                ComandoArduino servicioAccion = retrofitC.create( ComandoArduino.class);
-                Call<RespuestaSensores> serviciosCall = servicioAccion.infoSensores();
-                serviciosCall.enqueue(new Callback<RespuestaSensores>() {
+                ComandoArduino servicioAccion = retrofitB.create( ComandoArduino.class);
+                Call<Respuesta> serviciosCall = servicioAccion.apagarLEDRojo();
+                serviciosCall.enqueue(new Callback<Respuesta>() {
                     @Override
-                    public void onResponse(Call<RespuestaSensores> call, Response<RespuestaSensores> response) {
-                        //RespuestaSensores rs = response.body();
-
-                        tvTemperatura.setText("Temperatura: "+response.body().getTemperatura()+"°");
-                        tvMovimiento.setText("Detección de Movimiento: "+response.body().getMovimiento());
-                        tvLuz.setText("Nivel de luz: "+response.body().getLuz());
-                        tvFlama.setText("Detección de fuego: "+response.body().getFlama());
-
-                        System.out.println(response.body().getTemperatura());
-                        System.out.println(response.body().getMovimiento());
-                        System.out.println(response.body().getLuz());
-                        System.out.println(response.body().getFlama());
-
+                    public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                        if(response.body().getRespuesta().equals("OK")){
+                            // Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
-                    public void onFailure(Call<RespuestaSensores> call, Throwable t) {
-                        System.out.println(t.getMessage());
+                    public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                        //Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
                     }
                 });
-             }
+            }
 
         });
 
@@ -219,40 +220,46 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 public void onSensorChanged(SensorEvent sensorEvent) {
                     //Toast.makeText(MenuControlActivity.this, "Se detecta un cambio de proximidad", Toast.LENGTH_SHORT).show();
                     if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
-                        // Detected something nearby
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
+                        cantidadProximidad++;
+                        if(cantidadProximidad == 5) {
+                            Toast.makeText(MenuControlActivity.this, "Modo Debug: ACTIVADO", Toast.LENGTH_SHORT).show();
+                            cantidadProximidad = 0;
+                            // Detected something nearby
+                            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
 
-                        final TextView popupProximidad = new TextView(MenuControlActivity.this);
-                        popupProximidad.setText("\nEsta es una versión de prueba. Si le gustó puede realizar una donación");
-                        popupProximidad.setTextSize(18);
-                        popupProximidad.isTextAlignmentResolved();
-                        // set prompts.xml to alertdialog builder
-                        alertDialogBuilder.setView(popupProximidad);
+                            final TextView popupProximidad = new TextView(MenuControlActivity.this);
+                            popupProximidad.setText("\nEsta es una versión de prueba. Si le gustó puede realizar una donación");
+                            popupProximidad.setTextSize(18);
+                            popupProximidad.isTextAlignmentResolved();
+                            // set prompts.xml to alertdialog builder
+                            alertDialogBuilder.setView(popupProximidad);
 
-                        // set dialog message
-                        alertDialogBuilder.setCancelable(false).setPositiveButton("Donar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                final TextView popupDonar = new TextView(MenuControlActivity.this);
-                                popupDonar.setText("\nMentira, no hay versión full ;D");
-                                popupDonar.setTextSize(18);
-                                popupDonar.isTextAlignmentResolved();
-                                // set prompts.xml to alertdialog builder
-                                alertDialogBuilder.setView(popupDonar);
-                                AlertDialog alertDialog = alertDialogBuilder.create();
-                                // show it
-                                alertDialog.show();
-                            }
-                        });
-                        alertDialogBuilder.setCancelable(false).setNegativeButton("En otro momento", new DialogInterface.OnClickListener(){
-                            public void onClick(DialogInterface dialog, int id) {
-                            }
-                        });
-                        // create alert dialog
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        // show it
-                        alertDialog.show();
+                            // set dialog message
+                            alertDialogBuilder.setCancelable(false).setPositiveButton("Donar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    final TextView popupDonar = new TextView(MenuControlActivity.this);
+                                    popupDonar.setText("\nMentira, no hay versión full ;D");
+                                    popupDonar.setTextSize(18);
+                                    popupDonar.isTextAlignmentResolved();
+                                    // set prompts.xml to alertdialog builder
+                                    alertDialogBuilder.setView(popupDonar);
+                                    AlertDialog alertDialog = alertDialogBuilder.create();
+                                    // show it
+                                    alertDialog.show();
+                                }
+                            });
+                            alertDialogBuilder.setCancelable(false).setNegativeButton("En otro momento", new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                            // create alert dialog
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            // show it
+                            alertDialog.show();
 
-
+                        } else {
+                            Toast.makeText(MenuControlActivity.this, "Acerquece "+(3-cantidadProximidad)+" veces más para activar el modo DEBUG", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         // Nothing is nearby
                     //    getWindow().getDecorView().setBackgroundColor(Color.WHITE);
@@ -279,38 +286,6 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
 
 
-        /* Seteo los estados iniciales de los botones switch */
-
-        ComandoArduino servicioAccion = retrofitC.create( ComandoArduino.class);
-        Call<RespuestaActuadores> serviciosCalls = servicioAccion.infoActuadores();
-        Toast.makeText(MenuControlActivity.this, "Obteniendo estados de la casa... espere", Toast.LENGTH_LONG).show();
-        serviciosCalls.enqueue(new Callback<RespuestaActuadores>() {
-
-            @Override
-            public void onResponse(Call<RespuestaActuadores> call, Response<RespuestaActuadores> response) {
-                if(response.body().getSelfiehouse().equals("Activado")){
-                    switchSistema.setChecked(true);
-                }
-                if(response.body().getDebug().equals("Encendido")){
-                    switchDEBUG.setChecked(true);
-                }
-                if(response.body().getPuerta().equals("Trabada")){
-                    switchTraba.setChecked(true);
-                }
-                if(response.body().getBuzzer().equals("Encendido")){
-                    switchBuzzer.setChecked(true);
-                }
-                if(response.body().getVentilador().equals("Encendido")){
-                    switchVentilador.setChecked(true);
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<RespuestaActuadores> call, Throwable t) {
-
-            }
-        });
 
         /* Listener para switchSistema */
 
@@ -324,9 +299,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -334,9 +308,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -348,9 +320,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
-                            if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"SelfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
+                           if(response.body().getRespuesta().equals("OK")){
+                            //    Toast.makeText(MenuControlActivity.this,"SelfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -358,9 +329,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"SelfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MenuControlActivity.this,"SelfieHouse: DESACTIVADO", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -369,7 +338,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         });
 
         /* Listener para switchDEBUG */
-        switchDEBUG = (Switch) findViewById(R.id.switchDebug);
+        /*switchDEBUG = (Switch) findViewById(R.id.switchDebug);
         switchDEBUG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
@@ -420,6 +389,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                 }
             }
         });
+        */
 
         /* Listener para switchVentilador */
         switchVentilador = (Switch) findViewById(R.id.switchVentilador);
@@ -432,9 +402,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Ventilador: ACTIVADO", Toast.LENGTH_SHORT).show();
+                            //    Toast.makeText(MenuControlActivity.this,"Ventilador: ACTIVADO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -442,9 +411,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                           // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Ventilador: ACTIVADO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                        //   Toast.makeText(MenuControlActivity.this,"Ventilador: ACTIVADO", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
@@ -453,9 +420,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Ventilador: APAGADO", Toast.LENGTH_SHORT).show();
+                           //     Toast.makeText(MenuControlActivity.this,"Ventilador: APAGADO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -463,9 +429,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Ventilador: APAGADO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                        //   Toast.makeText(MenuControlActivity.this,"Ventilador: APAGADO", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -483,9 +447,9 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
+
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Buzzer: ENCENDIDO", Toast.LENGTH_SHORT).show();
+                            //    Toast.makeText(MenuControlActivity.this,"Buzzer: ENCENDIDO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -493,10 +457,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Buzzer: ENCENDIDO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
-                        }
+                           // Toast.makeText(MenuControlActivity.this,"Buzzer: ENCENDIDO", Toast.LENGTH_SHORT).show();
+                         }
                     });
 
 
@@ -507,9 +469,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Buzzer: APAGADO", Toast.LENGTH_SHORT).show();
+                            //    Toast.makeText(MenuControlActivity.this,"Buzzer: APAGADO", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -517,9 +478,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Buzzer: APAGADO", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(MenuControlActivity.this,"Buzzer: APAGADO", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -538,9 +497,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Puerta: TRABADA", Toast.LENGTH_SHORT).show();
+                                //   Toast.makeText(MenuControlActivity.this,"Puerta: TRABADA", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -548,9 +506,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Puerta: TRABADA", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                   //         Toast.makeText(MenuControlActivity.this,"Puerta: TRABADA", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -562,9 +518,8 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     serviciosCall.enqueue(new Callback<Respuesta>() {
                         @Override
                         public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                            System.out.println(response.body().getRespuesta());
                             if(response.body().getRespuesta().equals("OK")){
-                                Toast.makeText(MenuControlActivity.this,"Puerta: DESTRABADA", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(MenuControlActivity.this,"Puerta: DESTRABADA", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
                             }
@@ -572,9 +527,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
                         @Override
                         public void onFailure(Call<Respuesta> call, Throwable throwable) {
-                            // switchVentilador.setChecked(false);
-                            Toast.makeText(MenuControlActivity.this,"Puerta: DESTRABADA", Toast.LENGTH_SHORT).show();
-                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MenuControlActivity.this,"Puerta: DESTRABADA", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -584,50 +537,150 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
 
 
 
-        /* Obtengo la cantidad de solicitudes*/
-        AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
-        Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);
-        serviciosCall.enqueue(new Callback<List<AccesoSolicitud>>() {
+
+        actualizarSolicitudesAcceso();
+        actualizarDatosActuadores();
+        actualizarDatosSensores();
+
+
+    }
+
+    private void actualizarDatosActuadores() {
+        Toast.makeText(MenuControlActivity.this, "Obteniendo estados de la casa... espere", Toast.LENGTH_LONG).show();
+        new Thread(new Runnable() {
+            private final Handler handler = new Handler() ;
             @Override
-            public void onResponse(Call<List<AccesoSolicitud>> call, Response<List<AccesoSolicitud>> response) {
+            public void run() {
+                /* Seteo los estados iniciales de los botones switch */
 
-                List<AccesoSolicitud> as = response.body();
-                //cantidadDeSolicitudes = (TextView) findViewById(R.id.textCantidadDeSolicitudes);
-                //cantidadDeSolicitudes.setText("Solicitudes: "+as.size());
+                ComandoArduino servicioAccion = retrofitC.create( ComandoArduino.class);
+                Call<RespuestaActuadores> serviciosCalls = servicioAccion.infoActuadores();
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
+                serviciosCalls.enqueue(new Callback<RespuestaActuadores>() {
 
-                final TextView popupSolcitudes = new TextView(MenuControlActivity.this);
-                popupSolcitudes.setText("\nUsted tiene "+as.size()+" solicitud/es pendiente/s");
-                popupSolcitudes.setTextSize(18);
-                popupSolcitudes.isTextAlignmentResolved();
-                // set prompts.xml to alertdialog builder
-                alertDialogBuilder.setView(popupSolcitudes);
+                    @Override
+                    public void onResponse(Call<RespuestaActuadores> call, Response<RespuestaActuadores> response) {
+                        if(response.body().getSelfiehouse().equals("Activado")){
+                            switchSistema.setChecked(true);
+                        } else {
+                            switchSistema.setChecked(false);
+                        }
 
-                // set dialog message
-                alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                        if(response.body().getPuerta().equals("Trabada")){
+                            switchTraba.setChecked(true);
+                        } else {
+                            switchTraba.setChecked(false);
+                        }
+
+                        if(response.body().getBuzzer().equals("Encendido")){
+                            switchBuzzer.setChecked(true);
+                        }  else {
+                            switchBuzzer.setChecked(false);
+                        }
+
+                        if(response.body().getVentilador().equals("Encendido")){
+                            switchVentilador.setChecked(true);
+                        } else {
+                            switchVentilador.setChecked(false);
+                        }
+                   }
+
+                    @Override
+                    public void onFailure(Call<RespuestaActuadores> call, Throwable t) {
+
                     }
                 });
-                // create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                // show it
-                alertDialog.show();
-
-                System.out.println("Solicitudes ( "+as.size()+")");
-              //  cantidadDeSolicitudes.setTitle("Solicitudes ( "+as.size()+")");
-                //cantidadDeSolicitudes.setText("Solicitudes ( "+as.size()+")");
+                handler.postDelayed(this, 5000);
             }
+        }).start();
+    }
+
+    private void actualizarDatosSensores() {
+        Toast.makeText(MenuControlActivity.this,"Actualizando datos de sensores", Toast.LENGTH_SHORT).show();
+        new Thread(new Runnable() {
+            private final Handler handler = new Handler() ;
 
             @Override
-            public void onFailure(Call<List<AccesoSolicitud>> call, Throwable throwable) {
-                System.out.println("Error: "+throwable.getMessage());
+            public void run() {
+                ComandoArduino servicioAccion = retrofitC.create(ComandoArduino.class);
+                Call<RespuestaSensores> serviciosCall = servicioAccion.infoSensores();
+                serviciosCall.enqueue(new Callback<RespuestaSensores>() {
+                    @Override
+                    public void onResponse(Call<RespuestaSensores> call, Response<RespuestaSensores> response) {
+                        //RespuestaSensores rs = response.body();
+                        if(response.body().getTemperatura().equals("NaN")){
+
+                        } else {
+                            tvTemperatura.setText("Temperatura: "+response.body().getTemperatura()+"°");
+                        }
+
+                        tvMovimiento.setText("Detección de Movimiento: "+response.body().getMovimiento());
+                        tvLuz.setText("Nivel de luz: "+response.body().getLuz());
+                        tvFlama.setText("Detección de fuego: "+response.body().getFlama());
+                    }
+
+                    @Override
+                    public void onFailure(Call<RespuestaSensores> call, Throwable t) {
+                        System.out.println(t.getMessage());
+                    }
+                });
+                handler.postDelayed(this, 5000);
             }
-        });
+        }).start();
+    }
 
+    private void actualizarSolicitudesAcceso() {
 
+        //Toast.makeText(MenuControlActivity.this,"Actualizando datos de sensores", Toast.LENGTH_SHORT).show();
+        new Thread(new Runnable() {
+            private final Handler handler = new Handler() ;
+            private boolean primeraSolicitud = true;
+            @Override
+            public void run() {
+                System.out.println("Consultando solicitudes...");
+                AccesoSolicitudService servicioSolicitudAcceso = retrofit.create(AccesoSolicitudService.class);
+                Call<List<AccesoSolicitud>> serviciosCall = servicioSolicitudAcceso.getAccesoSolicitud(true);
+                serviciosCall.enqueue(new Callback<List<AccesoSolicitud>>() {
+                    @Override
+                    public void onResponse(Call<List<AccesoSolicitud>> call, Response<List<AccesoSolicitud>> response) {
+                        // La primera vez guardo el valor inicial
+                        if(primeraSolicitud){
+                            cantidadSolitudesAccesoInicial = response.body().size();
+                            primeraSolicitud = false;
+                        } else {
+                            if(response.body().size() != cantidadSolitudesAccesoInicial) {
+                                cantidadSolitudesAccesoInicial = response.body().size();
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
+                                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                v.vibrate(1000);        // No funca :(
+                                final TextView popupSolcitudes = new TextView(MenuControlActivity.this);
+                                popupSolcitudes.setText("\nUsted tiene una nueva solicitud de acceso!");
+                                popupSolcitudes.setTextSize(18);
+                                popupSolcitudes.isTextAlignmentResolved();
+                                // set prompts.xml to alertdialog builder
+                                alertDialogBuilder.setView(popupSolcitudes);
+                                alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                    }
+                                });
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                tvSolicitudesAcceso.setText("Solicitudes de Acceso ("+response.body().size()+")");
 
+                                alertDialog.show();
+                            }
 
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<AccesoSolicitud>> call, Throwable throwable) {
+                        System.out.println("Error: "+throwable.getMessage());
+                    }
+                });
+                handler.postDelayed(this, 10000);       // 10 segundos
+            }
+        }).start();
     }
 
     @Override
@@ -643,4 +696,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
         mShaker.pause();
 
     }
+
+
+
 }

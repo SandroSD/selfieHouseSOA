@@ -50,15 +50,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <Switch
-                android:id="@+id/switchDebug"
-                android:layout_width="306dp"
-                android:layout_height="wrap_content"
-                android:text="Modo Debug"
-                android:textAlignment="textStart"
-                android:textSize="16sp"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="16dp" />
         </TableRow>
 
         <TableRow
