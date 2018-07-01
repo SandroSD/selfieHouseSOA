@@ -333,8 +333,11 @@ bool iniciarWebserver()
     /* Informacion de los sensores */
     server.on("/infoSensores", infoSensores);
 
-	/* Informacion de los estados de actuadores */
+	  /* Informacion de los estados de actuadores */
     server.on("/infoActuadores", infoActuadores);
+    
+    /* Reset del dispositivo */
+    server.on("/reset", resetear);
   
     /* Excepcion ante una peticion no reconocida*/
     server.onNotFound(notFound);
@@ -370,6 +373,14 @@ bool iniciarCliente()
 /***************************************************************************
              FUNCIONES DE ACCION ANTE UNA PETICION DEL WEBSERVER
 ***************************************************************************/
+void resetear()
+{
+  parpadearLed(pinLEDVerde);
+  parpadearLed(pinLEDVerde);
+  ESP.restart();
+}
+
+
 void activarSelfieHouseWS()
 {
   Serial.println("Instruccion recibida: Estado selfieHouse ACTIVADO");

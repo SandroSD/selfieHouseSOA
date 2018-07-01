@@ -50,4 +50,7 @@ public interface ComandoArduino {
     @GET("redoff")
     Call<Respuesta> apagarLEDRojo();
 
+    @GET("reset")
+    Call<Respuesta> reiniciarArduino();
+
 }

@@ -222,33 +222,43 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                     if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
                         cantidadProximidad++;
                         if(cantidadProximidad == 5) {
-                            Toast.makeText(MenuControlActivity.this, "Modo Debug: ACTIVADO", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MenuControlActivity.this, "Reiniciar dispositivo", Toast.LENGTH_SHORT).show();
                             cantidadProximidad = 0;
                             // Detected something nearby
                             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuControlActivity.this);
 
                             final TextView popupProximidad = new TextView(MenuControlActivity.this);
-                            popupProximidad.setText("\nEsta es una versión de prueba. Si le gustó puede realizar una donación");
+                            popupProximidad.setText("\n¿Está seguro que quiere reiniciar el dispositivo?");
                             popupProximidad.setTextSize(18);
                             popupProximidad.isTextAlignmentResolved();
                             // set prompts.xml to alertdialog builder
                             alertDialogBuilder.setView(popupProximidad);
 
                             // set dialog message
-                            alertDialogBuilder.setCancelable(false).setPositiveButton("Donar", new DialogInterface.OnClickListener() {
+                            alertDialogBuilder.setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    final TextView popupDonar = new TextView(MenuControlActivity.this);
-                                    popupDonar.setText("\nMentira, no hay versión full ;D");
-                                    popupDonar.setTextSize(18);
-                                    popupDonar.isTextAlignmentResolved();
-                                    // set prompts.xml to alertdialog builder
-                                    alertDialogBuilder.setView(popupDonar);
-                                    AlertDialog alertDialog = alertDialogBuilder.create();
-                                    // show it
-                                    alertDialog.show();
+                                    ComandoArduino servicioAccion = retrofitB.create( ComandoArduino.class);
+                                    Call<Respuesta> serviciosCall = servicioAccion.reiniciarArduino();
+                                    Toast.makeText(MenuControlActivity.this,"Reiniciando...", Toast.LENGTH_SHORT).show();
+                                    serviciosCall.enqueue(new Callback<Respuesta>() {
+
+                                        @Override
+                                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                                            if(response.body().getRespuesta().equals("OK")){
+                                                // Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                              //  Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                                            //Toast.makeText(MenuControlActivity.this,"SelfieHouse: ACTIVADO", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 }
                             });
-                            alertDialogBuilder.setCancelable(false).setNegativeButton("En otro momento", new DialogInterface.OnClickListener(){
+                            alertDialogBuilder.setCancelable(false).setNegativeButton("No", new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialog, int id) {
                                 }
                             });
@@ -258,7 +268,7 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
                             alertDialog.show();
 
                         } else {
-                            Toast.makeText(MenuControlActivity.this, "Acerquece "+(3-cantidadProximidad)+" veces más para activar el modo DEBUG", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MenuControlActivity.this, "Acerquece "+(3-cantidadProximidad)+" veces más para reiniciar el dispositivo", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         // Nothing is nearby
