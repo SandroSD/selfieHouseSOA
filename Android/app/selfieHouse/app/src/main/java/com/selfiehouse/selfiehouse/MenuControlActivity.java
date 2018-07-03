@@ -347,6 +347,60 @@ public class MenuControlActivity extends AppCompatActivity implements Constantes
             }
         });
 
+        /* Listener para switchDEBUG */
+        /*switchDEBUG = (Switch) findViewById(R.id.switchDebug);
+        switchDEBUG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                if (bChecked) {
+                    ComandoArduino servicioAccion = retrofitB.create( ComandoArduino.class);
+                    Call<Respuesta> serviciosCall = servicioAccion.activarDebug();
+                    serviciosCall.enqueue(new Callback<Respuesta>() {
+                        @Override
+                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                            System.out.println(response.body().getRespuesta());
+                            if(response.body().getRespuesta().equals("OK")){
+                                Toast.makeText(MenuControlActivity.this,"Modo Debug: ACTIVADO", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                            // switchVentilador.setChecked(false);
+                            Toast.makeText(MenuControlActivity.this,"Modo Debug: ACTIVADO", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    ComandoArduino servicioAccion = retrofitB.create( ComandoArduino.class);
+                    Call<Respuesta> serviciosCall = servicioAccion.desactivarDebug();
+                    serviciosCall.enqueue(new Callback<Respuesta>() {
+                        @Override
+                        public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
+                            System.out.println(response.body().getRespuesta());
+                            if(response.body().getRespuesta().equals("OK")){
+                                Toast.makeText(MenuControlActivity.this,"Modo Debug: DESACTIVADO", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_ERROR_ACCION, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Respuesta> call, Throwable throwable) {
+                            // switchVentilador.setChecked(false);
+                            Toast.makeText(MenuControlActivity.this,"Modo Debug: DESACTIVADO", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(MenuControlActivity.this,Constantes.RESPUESTA_404, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        });
+        */
+
         /* Listener para switchVentilador */
         switchVentilador = (Switch) findViewById(R.id.switchVentilador);
         switchVentilador.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
