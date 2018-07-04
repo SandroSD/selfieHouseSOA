@@ -34,7 +34,6 @@
 #define CANTIDAD_INTENTOS_CONEXION 3
 #define TIMEOUT_CONEXION    10
 #define TIEMPO_PARPADEO     300       // ms
-#define ACTIVADO        1
 #define DESACTIVADO       0
 
 #define TOPE_FLAMA        1
